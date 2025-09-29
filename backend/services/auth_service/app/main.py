@@ -1,13 +1,35 @@
 from fastapi import FastAPI
-from app.api import auth
-from app.db.init_db import init_db
+from fastapi.middleware.cors import CORSMiddleware
+from api import auth
+from db.init_db import init_db
 
-app = FastAPI(title="Auth Service")
+app = FastAPI(
+    title="Auth Service",
+    description="Service d'authentification et gestion des utilisateurs",
+    version="1.0.0"
+)
+
+# Configuration CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Inclure les routes
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 
-# Initialiser la base de données au démarrage
 @app.on_event("startup")
-def on_startup():
-    init_db()
+async def startup_event():
+    """Initialisation de la base de données au démarrage"""
+    await init_db()
+
+@app.get("/")
+async def root():
+    return {"message": "Auth Service is running", "service": "auth_service"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "auth_service"}
