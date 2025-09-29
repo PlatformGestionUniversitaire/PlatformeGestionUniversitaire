@@ -1,42 +1,169 @@
-from sqlalchemy.orm import Session
-from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin
-from passlib.context import CryptContext
-from jose import jwt
 from datetime import datetime, timedelta
+from typing import Optional
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from models.user import User
+from schemas.user import UserCreate, TokenData
+from config import settings
 
-SECRET_KEY = "MY_SECRET_KEY"  # ⚠️ changer ça dans la config
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
+# Configuration de la sécurité
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+class AuthService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
 
-def create_user(db: Session, user: UserCreate):
-    db_user = User(
-        nom=user.nom,
-        prenom=user.prenom,
-        email=user.email,
-        role=user.role,
-        login=user.login,
-        mdp_hash=get_password_hash(user.mdp),
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    @staticmethod
+    def verify_password(plain_password: str, hashed_password: str) -> bool:
+        """Vérifie si le mot de passe correspond au hash"""
+        return pwd_context.verify(plain_password, hashed_password)
 
-def authenticate_user(db: Session, user: UserLogin):
-    db_user = db.query(User).filter(User.login == user.login).first()
-    if not db_user or not verify_password(user.mdp, db_user.mdp_hash):
-        return None
+    @staticmethod
+    def get_password_hash(password: str) -> str:
+        """Hash un mot de passe"""
+        return pwd_context.hash(password)
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    token_data = {"sub": db_user.login, "exp": expire}
-    token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-    return token
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        """Récupère un utilisateur par son email"""
+        result = await self.db.execute(
+            select(User).where(User.email == email)
+        )
+        return result.scalars().first()
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        """Récupère un utilisateur par son username"""
+        result = await self.db.execute(
+            select(User).where(User.username == username)
+        )
+        return result.scalars().first()
+
+    async def get_user_by_id(self, user_id: int) -> Optional[User]:
+        """Récupère un utilisateur par son ID"""
+        result = await self.db.execute(
+            select(User).where(User.id == user_id)
+        )
+        return result.scalars().first()
+
+    async def create_user(self, user_data: UserCreate) -> User:
+        """Crée un nouvel utilisateur"""
+        hashed_password = self.get_password_hash(user_data.password)
+
+        db_user = User(
+            email=user_data.email,
+            username=user_data.username,
+            hashed_password=hashed_password,
+            full_name=user_data.full_name,
+            is_active=True,
+            is_superuser=False
+        )
+
+        self.db.add(db_user)
+        await self.db.commit()
+        await self.db.refresh(db_user)
+
+        return db_user
+
+    async def authenticate_user(self, email: str, password: str) -> Optional[User]:
+        """Authentifie un utilisateur"""
+        user = await self.get_user_by_email(email)
+
+        if not user:
+            return None
+
+        if not self.verify_password(password, user.hashed_password):
+            return None
+
+        return user
+
+    @staticmethod
+    def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+        """Crée un token JWT"""
+        to_encode = data.copy()
+
+        if expires_delta:
+            expire = datetime.utcnow() + expires_delta
+        else:
+            expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+        return encoded_jwt
+
+    @staticmethod
+    async def get_current_user(
+            token: str = Depends(oauth2_scheme)
+    ) -> dict:
+        """Récupère l'utilisateur actuel à partir du token"""
+        from db.session import get_db
+
+        credentials_exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Impossible de valider les informations d'identification",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            email: str = payload.get("sub")
+            user_id: int = payload.get("id")
+
+            if email is None or user_id is None:
+                raise credentials_exception
+
+            token_data = TokenData(email=email, id=user_id)
+
+        except JWTError:
+            raise credentials_exception
+
+        # Créer une session temporaire pour vérifier l'utilisateur
+        from db.session import AsyncSessionLocal
+        async with AsyncSessionLocal() as db:
+            auth_service = AuthService(db)
+            user = await auth_service.get_user_by_email(email=token_data.email)
+
+            if user is None:
+                raise credentials_exception
+
+            return {"id": user.id, "email": user.email, "username": user.username}
+
+    async def update_user(self, user_id: int, user_data: UserCreate) -> Optional[User]:
+        """Met à jour un utilisateur"""
+        user = await self.get_user_by_id(user_id)
+
+        if not user:
+            return None
+
+        if user_data.email:
+            user.email = user_data.email
+        if user_data.username:
+            user.username = user_data.username
+        if user_data.full_name:
+            user.full_name = user_data.full_name
+        if user_data.password:
+            user.hashed_password = self.get_password_hash(user_data.password)
+
+        user.updated_at = datetime.utcnow()
+
+        await self.db.commit()
+        await self.db.refresh(user)
+
+        return user
+
+    async def delete_user(self, user_id: int) -> bool:
+        """Supprime un utilisateur"""
+        user = await self.get_user_by_id(user_id)
+
+        if not user:
+            return False
+
+        await self.db.delete(user)
+        await self.db.commit()
+
+        return True

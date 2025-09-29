@@ -1,9 +1,4 @@
-FROM python:3.11-slim
+FROM ubuntu:latest
+LABEL authors="GIGABYTE"
 
-WORKDIR /app
-
-COPY ./app /app
-
-RUN pip install --no-cache-dir fastapi uvicorn sqlalchemy pydantic passlib[bcrypt] python-jose
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+ENTRYPOINT ["top", "-b"]

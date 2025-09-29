@@ -1,21 +1,22 @@
-from pydantic import BaseModel, EmailStr
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
-class UserBase(BaseModel):
-    nom: str
-    prenom: str
-    email: EmailStr
-    role: str
-    login: str
+Base = declarative_base()
 
-class UserCreate(UserBase):
-    mdp: str
 
-class UserLogin(BaseModel):
-    login: str
-    mdp: str
+class User(Base):
+    __tablename__ = "users"
 
-class UserResponse(UserBase):
-    id: int
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    class Config:
-        orm_mode = True
+    def __repr__(self):
+        return f"<User(id={self.id}, email={self.email}, username={self.username})>"
