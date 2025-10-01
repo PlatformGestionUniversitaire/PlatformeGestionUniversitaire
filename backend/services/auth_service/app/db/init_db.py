@@ -1,3 +1,12 @@
+import sys
+import os
+from pathlib import Path
+
+# Ajouter le répertoire app au PYTHONPATH
+current_dir = Path(__file__).parent
+app_dir = current_dir.parent
+sys.path.insert(0, str(app_dir))
+
 from db.session import engine, Base
 import logging
 
@@ -7,7 +16,7 @@ from models.user import User  # noqa: F401
 logger = logging.getLogger(__name__)
 
 
-async def init_db():
+async def init_db(): 
     """
     Initialise la base de données en créant toutes les tables
     """
@@ -36,3 +45,9 @@ async def drop_db():
     except Exception as e:
         logger.error(f"❌ Erreur lors de la suppression de la base de données: {e}")
         raise
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    asyncio.run(init_db())

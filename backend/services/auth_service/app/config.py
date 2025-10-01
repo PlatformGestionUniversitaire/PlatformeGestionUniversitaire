@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "postgresql+asyncpg://postgres:postgres@db:5432/auth_db"
+        "postgresql+asyncpg://postgres:Taha2004@localhost/auth_db"
     )
 
     # JWT
