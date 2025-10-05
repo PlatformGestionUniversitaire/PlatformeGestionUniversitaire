@@ -1,3 +1,50 @@
-<div class="not-found">
-  <h2>404 - Page Not Found</h2>
+<div class="not-found-container">
+  <div class="content">
+    <!-- Animated 404 -->
+    <div class="error-code">
+      <span class="digit">4</span>
+      <span class="digit zero">0</span>
+      <span class="digit">4</span>
+    </div>
+
+    <!-- Error Message -->
+    <h1 class="title">Page Not Found</h1>
+    <p class="description">
+      Oops! The page you're looking for seems to have wandered off into the digital void.
+    </p>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+      <button class="btn btn-primary" (click)="goHome()">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        Go Home
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Go Back
+      </button>
+    </div>
+
+    <!-- Helpful Links -->
+    <div class="helpful-links">
+      <p class="links-title">You might be interested in:</p>
+      <div class="links">
+        <a routerLink="/" class="link">Home</a>
+        <a routerLink="/about" class="link">About</a>
+        <a routerLink="/contact" class="link">Contact</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Elements Background -->
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
 </div>
