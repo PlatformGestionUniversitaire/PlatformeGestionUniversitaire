@@ -1,3 +1,5 @@
 import { Component } from '@angular/core';
-@Component({ selector: 'app-director-dashboard', template: '<div>Director Dashboard</div>' })
+import { CommonModule } from '@angular/common';
+
+@Component({ selector: 'app-director-dashboard', standalone: true, imports: [CommonModule], template: '<div>Director Dashboard</div>' })
 export class DirectorDashboardComponent {}

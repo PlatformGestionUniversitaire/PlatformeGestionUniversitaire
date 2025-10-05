@@ -1,3 +1,40 @@
-<section class="landing">
-  <h1>Welcome to University Platform</h1>
+<section class="landing-hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <h1>{{ title }}</h1>
+      <p class="subtitle">Une plateforme moderne pour gérer la vie universitaire — étudiants, enseignants et administration.</p>
+      <div class="cta-row">
+        <button mat-raised-button color="primary" (click)="getStarted()">Commencer</button>
+        <button mat-stroked-button (click)="openDocs()">Documentation</button>
+      </div>
+    </div>
+    <div class="hero-card mat-card-like">
+      <div class="stats">
+        <div>
+          <div class="stat-value">12k+</div>
+          <div class="stat-label">Utilisateurs</div>
+        </div>
+        <div>
+          <div class="stat-value">24/7</div>
+          <div class="stat-label">Support</div>
+        </div>
+      </div>
+      <img src="/assets/images/logo-university.png" alt="logo" class="hero-logo" />
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-inner">
+    <h2>Fonctionnalités clés</h2>
+    <div class="feature-list">
+      <div class="feature mat-card-like" *ngFor="let f of features">
+        <div class="feature-icon"><span class="material-icons">school</span></div>
+        <div>
+          <div class="feature-title">{{ f.title }}</div>
+          <div class="feature-desc">{{ f.desc }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
