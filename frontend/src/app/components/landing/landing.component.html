@@ -1,25 +1,42 @@
 <section class="landing-hero">
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+
+  <!-- Top-left ISET Tozeur logo (add image at /assets/images/logo-iset-tozeur.png) -->
+  <div class="top-left-logo" aria-hidden="false">
+    <img src="/assets/images/logo-iset-tozeur.svg" alt="ISET Tozeur" onerror="this.onerror=null;this.src='/assets/images/logo-university.svg'" />
+  </div>
+
   <div class="hero-inner">
-    <div class="hero-copy">
-      <h1>{{ title }}</h1>
-      <p class="subtitle">Une plateforme moderne pour gérer la vie universitaire — étudiants, enseignants et administration.</p>
-      <div class="cta-row">
-        <button mat-raised-button color="primary" (click)="getStarted()">Commencer</button>
-        <button mat-stroked-button (click)="openDocs()">Documentation</button>
+    <div class="content">
+      <div class="hero-copy">
+        <h1>{{ title }}</h1>
+        <p class="subtitle">Une plateforme moderne pour gérer la vie universitaire — étudiants, enseignants et administration.</p>
+        <div class="cta-row">
+          <button class="btn btn-primary" mat-raised-button color="primary" (click)="getStarted()">Commencer</button>
+          
+        </div>
       </div>
     </div>
+
     <div class="hero-card mat-card-like">
       <div class="stats">
-        <div>
-          <div class="stat-value">12k+</div>
+        <div class="stat-item">
+          <div class="stat-shape stat-shape-blue" aria-hidden="true"></div>
+          <div class="stat-value">{{ usersDisplay }}</div>
           <div class="stat-label">Utilisateurs</div>
         </div>
-        <div>
+        <div class="stat-item">
+          <div class="stat-shape stat-shape-yellow" aria-hidden="true"></div>
           <div class="stat-value">24/7</div>
           <div class="stat-label">Support</div>
         </div>
       </div>
-      <img src="/assets/images/logo-university.png" alt="logo" class="hero-logo" />
+     
     </div>
   </div>
 </section>

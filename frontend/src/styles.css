@@ -1,4 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+	/* Brand color tokens (from user) */
+	--brand-dark-blue: #006699; /* RGB(0,102,153) */
+	--brand-light-blue: #33AADD; /* RGB(51,170,221) */
+	--brand-white: #FFFFFF; /* RGB(255,255,255) */
+	--brand-black: #1A1A1A; /* RGB(26,26,26) */
+	--brand-yellow: #F4C842; /* RGB(244,200,66) */
+
+	/* Utility */
+	--glass-white: rgba(255,255,255,0.12);
+	--glass-white-strong: rgba(255,255,255,0.2);
+}
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
