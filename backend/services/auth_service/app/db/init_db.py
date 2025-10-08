@@ -1,12 +1,3 @@
-import sys
-import os
-from pathlib import Path
-
-# Ajouter le répertoire app au PYTHONPATH
-current_dir = Path(__file__).parent
-app_dir = current_dir.parent
-sys.path.insert(0, str(app_dir))
-
 from db.session import engine, Base
 import logging
 

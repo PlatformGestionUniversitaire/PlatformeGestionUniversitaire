@@ -1,5 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import logging_config
+# Central logging configuration shared across services
+from fastapi import FastAPI
+
+app = FastAPI()
+
 from api import auth
 from db.init_db import init_db
 

@@ -9,6 +9,7 @@ from sqlalchemy import select
 from models.user import User
 from schemas.user import UserCreate, TokenData
 from config import settings
+import logging
 
 # Configuration de la sécurité
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -18,6 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 class AuthService:
     def __init__(self, db: AsyncSession):
         self.db = db
+        self.logger = logging.getLogger(__name__)
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -27,6 +29,9 @@ class AuthService:
     @staticmethod
     def get_password_hash(password: str) -> str:
         """Hash un mot de passe"""
+        # Ensure password doesn't exceed bcrypt's 72 byte limit
+        if len(password.encode('utf-8')) > 72:
+            password = password[:72]
         return pwd_context.hash(password)
 
     async def get_user_by_email(self, email: str) -> Optional[User]:
@@ -59,6 +64,7 @@ class AuthService:
             username=user_data.username,
             hashed_password=hashed_password,
             full_name=user_data.full_name,
+            role=getattr(user_data, "role", "etudiant"),
             is_active=True,
             is_superuser=False
         )
@@ -66,6 +72,18 @@ class AuthService:
         self.db.add(db_user)
         await self.db.commit()
         await self.db.refresh(db_user)
+
+        # Log to console / application logger that the user has been created
+        try:
+            self.logger.info(
+                "Utilisateur créé: id=%s email=%s username=%s",
+                db_user.id,
+                db_user.email,
+                db_user.username,
+            )
+        except Exception:
+            # Fallback to print if logging configuration isn't set
+            print(f"Utilisateur créé: id={db_user.id} email={db_user.email} username={db_user.username}")
 
         return db_user
 
@@ -148,6 +166,9 @@ class AuthService:
             user.full_name = user_data.full_name
         if user_data.password:
             user.hashed_password = self.get_password_hash(user_data.password)
+        # Update role if provided
+        if getattr(user_data, "role", None):
+            user.role = user_data.role
 
         user.updated_at = datetime.utcnow()
 

@@ -1,5 +1,14 @@
 import os
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except Exception:  # pragma: no cover - fallback for lightweight environments
+    try:
+        from pydantic import BaseSettings  # older pydantic packaged BaseSettings
+    except Exception:
+        # Minimal fallback so imports don't fail in environments without pydantic
+        class BaseSettings:  # type: ignore
+            def __init_subclass__(cls, **kwargs):
+                return None
 
 
 class Settings(BaseSettings):

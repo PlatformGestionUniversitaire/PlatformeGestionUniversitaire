@@ -4,8 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.user import UserCreate, UserResponse, Token, UserLogin
 from services.auth_service import AuthService
 from db.session import get_db
+import logging
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -28,6 +30,12 @@ async def register(
 
     # Créer l'utilisateur
     user = await auth_service.create_user(user_data)
+    # Log confirmation
+    try:
+        logger.info("Nouvel utilisateur enregistré: id=%s email=%s username=%s", user.id, user.email, user.username)
+    except Exception:
+        print(f"Nouvel utilisateur enregistré: id={user.id} email={user.email} username={user.username}")
+
     return user
 
 

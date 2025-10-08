@@ -1,6 +1,10 @@
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from config import settings
+
+# Ensure SQLAlchemy engine-level INFO logs are suppressed by default
+logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 # Créer le moteur asynchrone
 engine = create_async_engine(
