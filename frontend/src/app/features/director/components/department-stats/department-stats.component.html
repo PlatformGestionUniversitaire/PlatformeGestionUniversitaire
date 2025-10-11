@@ -1,0 +1,331 @@
+<div class="department-stats">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Statistiques du Département</h1>
+        <p class="subtitle">Tableau de bord complet des performances</p>
+      </div>
+      
+      <div class="header-controls">
+        <mat-form-field appearance="outline" class="period-select">
+          <mat-label>Période</mat-label>
+          <mat-select [(value)]="selectedPeriod" (selectionChange)="onPeriodChange()">
+            <mat-option *ngFor="let option of periodOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && stats" class="content-container">
+    
+    <!-- Key Metrics Overview -->
+    <section class="metrics-overview">
+      <div class="metrics-grid">
+        
+        <!-- General Stats -->
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="metric-icon people">people</mat-icon>
+            <mat-card-title>Effectifs</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric-row">
+              <span class="metric-label">Étudiants</span>
+              <span class="metric-value">{{ stats.totalStudents }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Enseignants</span>
+              <span class="metric-value">{{ stats.totalTeachers }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Groupes</span>
+              <span class="metric-value">{{ stats.totalGroups }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Academic Performance -->
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="metric-icon performance">grade</mat-icon>
+            <mat-card-title>Performance Académique</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric-highlight">
+              <div class="highlight-value">{{ stats.averageGrade }}/20</div>
+              <div class="highlight-label">Moyenne Générale</div>
+            </div>
+            <div class="performance-bar">
+              <mat-progress-bar mode="determinate" [value]="stats.averageGrade * 5" color="primary"></mat-progress-bar>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Attendance -->
+        <mat-card class="metric-card" [class]="'status-' + getAbsenteeismStatus()">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="metric-icon attendance">person_off</mat-icon>
+            <mat-card-title>Assiduité</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric-highlight">
+              <div class="highlight-value">{{ stats.absenteeismRate }}%</div>
+              <div class="highlight-label">Taux d'Absentéisme</div>
+            </div>
+            <div class="status-indicator" [class]="getAbsenteeismStatus()">
+              <span *ngIf="getAbsenteeismStatus() === 'good'">Excellent</span>
+              <span *ngIf="getAbsenteeismStatus() === 'attention'">Attention</span>
+              <span *ngIf="getAbsenteeismStatus() === 'warning'">Préoccupant</span>
+              <span *ngIf="getAbsenteeismStatus() === 'critical'">Critique</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Room Occupancy -->
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="metric-icon rooms">meeting_room</mat-icon>
+            <mat-card-title>Occupation des Salles</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric-highlight">
+              <div class="highlight-value">{{ stats.roomOccupancyRate }}%</div>
+              <div class="highlight-label">Taux d'Occupation</div>
+            </div>
+            <div class="occupancy-bar">
+              <mat-progress-bar mode="determinate" [value]="stats.roomOccupancyRate" 
+                               [color]="getRoomOccupancyStatus() === 'high' ? 'warn' : 'accent'">
+              </mat-progress-bar>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </section>
+
+    <!-- Detailed Analysis Tabs -->
+    <section class="analysis-section">
+      <mat-tab-group class="analysis-tabs" dynamicHeight>
+        
+        <!-- Performance Analysis -->
+        <mat-tab label="Performance des Étudiants">
+          <div class="tab-content">
+            <mat-card class="analysis-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>analytics</mat-icon>
+                <mat-card-title>Classement des Étudiants</mat-card-title>
+                <mat-card-subtitle>Performance par étudiant</mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <div *ngIf="studentPerformances.length === 0" class="no-data">
+                  <mat-icon>assessment</mat-icon>
+                  <h3>Données en cours de collecte</h3>
+                  <p>Les performances des étudiants seront disponibles prochainement.</p>
+                </div>
+                
+                <div *ngIf="studentPerformances.length > 0" class="table-container">
+                  <table mat-table [dataSource]="studentPerformances" class="performance-table">
+                    
+                    <ng-container matColumnDef="rank">
+                      <th mat-header-cell *matHeaderCellDef>Rang</th>
+                      <td mat-cell *matCellDef="let student">
+                        <div class="rank-badge" [class]="'rank-' + (student.rank <= 3 ? 'top' : 'normal')">
+                          {{ student.rank }}
+                        </div>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="student">
+                      <th mat-header-cell *matHeaderCellDef>Étudiant</th>
+                      <td mat-cell *matCellDef="let student">{{ student.studentName }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="group">
+                      <th mat-header-cell *matHeaderCellDef>Groupe</th>
+                      <td mat-cell *matCellDef="let student">{{ student.groupId }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="average">
+                      <th mat-header-cell *matHeaderCellDef>Moyenne</th>
+                      <td mat-cell *matCellDef="let student">
+                        <div class="grade-display" [class]="'grade-' + getPerformanceColor(student.overallAverage)">
+                          {{ student.overallAverage }}/20
+                        </div>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="attendance">
+                      <th mat-header-cell *matHeaderCellDef>Assiduité</th>
+                      <td mat-cell *matCellDef="let student">
+                        <div class="attendance-display" [class]="'attendance-' + getAttendanceColor(student.attendanceRate)">
+                          {{ student.attendanceRate }}%
+                        </div>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef>Actions</th>
+                      <td mat-cell *matCellDef="let student">
+                        <button mat-icon-button color="primary">
+                          <mat-icon>visibility</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="performanceColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: performanceColumns;"></tr>
+                  </table>
+                </div>
+              </mat-card-content>
+              
+              <mat-card-actions align="end">
+                <button mat-button color="primary" (click)="exportReport('performance')">
+                  <mat-icon>download</mat-icon>
+                  Exporter
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <!-- Absence Analysis -->
+        <mat-tab label="Analyse des Absences">
+          <div class="tab-content">
+            <mat-card class="analysis-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>person_off</mat-icon>
+                <mat-card-title>Rapport d'Absences</mat-card-title>
+                <mat-card-subtitle>Évolution sur la période sélectionnée</mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <div *ngIf="absenceReports.length === 0" class="no-data">
+                  <mat-icon>event_busy</mat-icon>
+                  <h3>Aucune donnée d'absence</h3>
+                  <p>Les rapports d'absence seront disponibles une fois les données collectées.</p>
+                </div>
+                
+                <div *ngIf="absenceReports.length > 0" class="absence-reports">
+                  <div *ngFor="let report of absenceReports" class="absence-report-item">
+                    <div class="report-header">
+                      <div class="report-date">{{ report.date | date:'dd/MM/yyyy' }}</div>
+                      <div class="report-summary">
+                        <span class="absence-count">{{ report.totalAbsences }} absences</span>
+                        <span class="absence-rate" [class]="'rate-' + (report.absenteeismRate > 15 ? 'high' : report.absenteeismRate > 10 ? 'medium' : 'low')">
+                          {{ report.absenteeismRate }}%
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div class="report-details">
+                      <div class="details-section">
+                        <h4>Par Matière</h4>
+                        <div class="detail-list">
+                          <div *ngFor="let item of report.bySubject | keyvalue" class="detail-item">
+                            <span class="detail-label">{{ item.key }}</span>
+                            <span class="detail-value">{{ item.value }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="details-section">
+                        <h4>Par Groupe</h4>
+                        <div class="detail-list">
+                          <div *ngFor="let item of report.byGroup | keyvalue" class="detail-item">
+                            <span class="detail-label">{{ item.key }}</span>
+                            <span class="detail-value">{{ item.value }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+              
+              <mat-card-actions align="end">
+                <button mat-button color="primary" (click)="exportReport('absence')">
+                  <mat-icon>download</mat-icon>
+                  Exporter
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <!-- Resource Utilization -->
+        <mat-tab label="Utilisation des Ressources">
+          <div class="tab-content">
+            <mat-card class="analysis-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>meeting_room</mat-icon>
+                <mat-card-title>Utilisation des Salles</mat-card-title>
+                <mat-card-subtitle>Optimisation des espaces</mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <div class="resource-metrics">
+                  <div class="resource-metric">
+                    <div class="metric-icon-wrapper">
+                      <mat-icon>meeting_room</mat-icon>
+                    </div>
+                    <div class="metric-info">
+                      <div class="metric-title">Taux d'Occupation Global</div>
+                      <div class="metric-value-large">{{ stats.roomOccupancyRate }}%</div>
+                      <mat-progress-bar mode="determinate" [value]="stats.roomOccupancyRate" 
+                                       [color]="getRoomOccupancyStatus() === 'high' ? 'warn' : 'primary'">
+                      </mat-progress-bar>
+                    </div>
+                  </div>
+                  
+                  <div class="resource-recommendations">
+                    <h4>Recommandations</h4>
+                    <div class="recommendation-list">
+                      <div class="recommendation-item" *ngIf="stats.roomOccupancyRate > 85">
+                        <mat-icon color="warn">warning</mat-icon>
+                        <span>Occupation élevée - Envisager une optimisation des créneaux</span>
+                      </div>
+                      <div class="recommendation-item" *ngIf="stats.roomOccupancyRate < 60">
+                        <mat-icon color="accent">info</mat-icon>
+                        <span>Opportunité d'optimisation - Salles sous-utilisées</span>
+                      </div>
+                      <div class="recommendation-item" *ngIf="stats.conflictsCount > 0">
+                        <mat-icon color="warn">priority_high</mat-icon>
+                        <span>{{ stats.conflictsCount }} conflit(s) d'emploi du temps à résoudre</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+              
+              <mat-card-actions align="end">
+                <button mat-button color="primary" (click)="exportReport('resources')">
+                  <mat-icon>download</mat-icon>
+                  Exporter
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </section>
+
+  </div>
+</div>

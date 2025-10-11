@@ -1,0 +1,324 @@
+<div class="referentials">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Référentiels</h1>
+      <p class="subtitle">Administration des matières et groupes du département</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading" class="content-container">
+    <mat-tab-group class="referentials-tabs" dynamicHeight>
+      
+      <!-- Subjects Tab -->
+      <mat-tab label="Matières">
+        <div class="tab-content">
+          <mat-card class="management-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>book</mat-icon>
+              <mat-card-title>Gestion des Matières</mat-card-title>
+              <mat-card-subtitle>{{ subjects.length }} matière(s) enregistrée(s)</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="card-actions">
+                <button mat-raised-button color="primary" (click)="createSubject()">
+                  <mat-icon>add</mat-icon>
+                  Nouvelle Matière
+                </button>
+              </div>
+
+              <div class="table-container">
+                <table mat-table [dataSource]="subjects" class="subjects-table">
+                  
+                  <ng-container matColumnDef="code">
+                    <th mat-header-cell *matHeaderCellDef>Code</th>
+                    <td mat-cell *matCellDef="let subject">
+                      <div class="subject-code">{{ subject.code }}</div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Nom de la Matière</th>
+                    <td mat-cell *matCellDef="let subject">
+                      <div class="subject-name">{{ subject.name }}</div>
+                      <div class="subject-description">{{ subject.description }}</div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="credits">
+                    <th mat-header-cell *matHeaderCellDef>Crédits</th>
+                    <td mat-cell *matCellDef="let subject">
+                      <mat-chip color="accent">{{ subject.credits }} ECTS</mat-chip>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="semester">
+                    <th mat-header-cell *matHeaderCellDef>Semestre</th>
+                    <td mat-cell *matCellDef="let subject">
+                      <mat-chip color="primary">{{ getSemesterLabel(subject.semester) }}</mat-chip>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="prerequisites">
+                    <th mat-header-cell *matHeaderCellDef>Prérequis</th>
+                    <td mat-cell *matCellDef="let subject">
+                      <div class="prerequisites">
+                        <mat-chip *ngFor="let prereq of subject.prerequisites" 
+                                 class="prerequisite-chip">
+                          {{ prereq }}
+                        </mat-chip>
+                        <span *ngIf="subject.prerequisites.length === 0" class="no-prereq">
+                          Aucun
+                        </span>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let subject">
+                      <button mat-icon-button [matMenuTriggerFor]="subjectMenu" color="primary">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu #subjectMenu="matMenu">
+                        <button mat-menu-item (click)="editSubject(subject)">
+                          <mat-icon>edit</mat-icon>
+                          <span>Modifier</span>
+                        </button>
+                        <button mat-menu-item>
+                          <mat-icon>visibility</mat-icon>
+                          <span>Voir détails</span>
+                        </button>
+                        <mat-divider></mat-divider>
+                        <button mat-menu-item (click)="deleteSubject(subject)" class="delete-action">
+                          <mat-icon color="warn">delete</mat-icon>
+                          <span>Supprimer</span>
+                        </button>
+                      </mat-menu>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="subjectColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: subjectColumns;"></tr>
+                </table>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Groups Tab -->
+      <mat-tab label="Groupes">
+        <div class="tab-content">
+          <mat-card class="management-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>group</mat-icon>
+              <mat-card-title>Gestion des Groupes</mat-card-title>
+              <mat-card-subtitle>{{ groups.length }} groupe(s) enregistré(s)</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="card-actions">
+                <button mat-raised-button color="primary" (click)="createGroup()">
+                  <mat-icon>add</mat-icon>
+                  Nouveau Groupe
+                </button>
+              </div>
+
+              <div class="table-container">
+                <table mat-table [dataSource]="groups" class="groups-table">
+                  
+                  <ng-container matColumnDef="code">
+                    <th mat-header-cell *matHeaderCellDef>Code</th>
+                    <td mat-cell *matCellDef="let group">
+                      <div class="group-code">{{ group.code }}</div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Nom du Groupe</th>
+                    <td mat-cell *matCellDef="let group">
+                      <div class="group-name">{{ group.name }}</div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="semester">
+                    <th mat-header-cell *matHeaderCellDef>Semestre</th>
+                    <td mat-cell *matCellDef="let group">
+                      <mat-chip color="primary">{{ getSemesterLabel(group.semester) }}</mat-chip>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="students">
+                    <th mat-header-cell *matHeaderCellDef>Étudiants</th>
+                    <td mat-cell *matCellDef="let group">
+                      <div class="student-count">
+                        <span class="count">{{ group.studentCount }}</span>
+                        <span class="capacity">/ {{ group.maxCapacity }}</span>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="capacity">
+                    <th mat-header-cell *matHeaderCellDef>Capacité</th>
+                    <td mat-cell *matCellDef="let group">
+                      <div class="capacity-info">
+                        <div class="capacity-bar">
+                          <mat-progress-bar 
+                            mode="determinate" 
+                            [value]="getCapacityPercentage(group)"
+                            [color]="getCapacityColor(group)">
+                          </mat-progress-bar>
+                        </div>
+                        <div class="capacity-text">
+                          {{ getCapacityPercentage(group) | number:'1.0-0' }}%
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="subjects">
+                    <th mat-header-cell *matHeaderCellDef>Matières</th>
+                    <td mat-cell *matCellDef="let group">
+                      <div class="group-subjects">
+                        <mat-chip *ngFor="let subjectId of group.subjects.slice(0, 2)" 
+                                 class="subject-chip">
+                          {{ subjectId }}
+                        </mat-chip>
+                        <mat-chip *ngIf="group.subjects.length > 2" 
+                                 color="accent" 
+                                 class="more-subjects">
+                          +{{ group.subjects.length - 2 }}
+                        </mat-chip>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let group">
+                      <button mat-icon-button [matMenuTriggerFor]="groupMenu" color="primary">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu #groupMenu="matMenu">
+                        <button mat-menu-item (click)="viewGroupDetails(group)">
+                          <mat-icon>visibility</mat-icon>
+                          <span>Voir détails</span>
+                        </button>
+                        <button mat-menu-item (click)="editGroup(group)">
+                          <mat-icon>edit</mat-icon>
+                          <span>Modifier</span>
+                        </button>
+                        <button mat-menu-item>
+                          <mat-icon>people</mat-icon>
+                          <span>Gérer étudiants</span>
+                        </button>
+                        <button mat-menu-item>
+                          <mat-icon>schedule</mat-icon>
+                          <span>Emploi du temps</span>
+                        </button>
+                        <mat-divider></mat-divider>
+                        <button mat-menu-item (click)="deleteGroup(group)" class="delete-action">
+                          <mat-icon color="warn">delete</mat-icon>
+                          <span>Supprimer</span>
+                        </button>
+                      </mat-menu>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="groupColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: groupColumns;"></tr>
+                </table>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Statistics Tab -->
+      <mat-tab label="Statistiques">
+        <div class="tab-content">
+          <div class="stats-grid">
+            
+            <!-- Subject Statistics -->
+            <mat-card class="stat-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="stat-icon subjects">book</mat-icon>
+                <mat-card-title>Matières par Semestre</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="semester-stats">
+                  <div *ngFor="let semester of [1,2,3,4,5,6]" class="semester-item">
+                    <div class="semester-label">Semestre {{ semester }}</div>
+                    <div class="semester-count">
+                      {{ (subjects | filter: 'semester':semester).length }} matières
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Group Statistics -->
+            <mat-card class="stat-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="stat-icon groups">group</mat-icon>
+                <mat-card-title>Répartition des Groupes</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="group-stats">
+                  <div class="stat-item">
+                    <div class="stat-value">{{ getTotalStudents() }}</div>
+                    <div class="stat-label">Total Étudiants</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{{ getTotalCapacity() }}</div>
+                    <div class="stat-label">Capacité Totale</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{{ getOccupancyRate() | number:'1.1-1' }}%</div>
+                    <div class="stat-label">Taux d'Occupation</div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Credit Distribution -->
+            <mat-card class="stat-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="stat-icon credits">grade</mat-icon>
+                <mat-card-title>Répartition des Crédits</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="credits-stats">
+                  <div class="credit-item">
+                    <div class="credit-value">{{ getTotalCredits() }}</div>
+                    <div class="credit-label">Total ECTS</div>
+                  </div>
+                  <div class="credit-item">
+                    <div class="credit-value">{{ getAverageCredits() | number:'1.1-1' }}</div>
+                    <div class="credit-label">Moyenne par Matière</div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div>

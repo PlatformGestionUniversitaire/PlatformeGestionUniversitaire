@@ -1,0 +1,171 @@
+<div class="director-dashboard">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Tableau de Bord Directeur</h1>
+      <p class="subtitle">Gestion complète de votre département</p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading" class="dashboard-content">
+    
+    <!-- Statistics Overview -->
+    <section class="stats-section">
+      <h2>Aperçu Statistique</h2>
+      <div class="stats-grid" *ngIf="stats">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalStudents }}</div>
+            <div class="stat-label">Étudiants</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>school</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalTeachers }}</div>
+            <div class="stat-label">Enseignants</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>book</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalSubjects }}</div>
+            <div class="stat-label">Matières</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>group_work</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalGroups }}</div>
+            <div class="stat-label">Groupes</div>
+          </div>
+        </div>
+
+        <div class="stat-card warning" *ngIf="stats.absenteeismRate > 10">
+          <div class="stat-icon">
+            <mat-icon>person_off</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.absenteeismRate }}%</div>
+            <div class="stat-label">Absentéisme</div>
+          </div>
+        </div>
+
+        <div class="stat-card success">
+          <div class="stat-icon">
+            <mat-icon>grade</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.averageGrade }}/20</div>
+            <div class="stat-label">Moyenne</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>meeting_room</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.roomOccupancyRate }}%</div>
+            <div class="stat-label">Occupation Salles</div>
+          </div>
+        </div>
+
+        <div class="stat-card" [class.warning]="stats.conflictsCount > 0">
+          <div class="stat-icon">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.conflictsCount }}</div>
+            <div class="stat-label">Conflits</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <h2>Actions Rapides</h2>
+      <div class="actions-grid">
+        <mat-card 
+          *ngFor="let action of quickActions" 
+          class="action-card" 
+          [class]="'action-' + action.color"
+          (click)="navigateTo(action.route)">
+          
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>{{ action.icon }}</mat-icon>
+              <span *ngIf="action.badge" class="action-badge">{{ action.badge }}</span>
+            </div>
+          </div>
+          
+          <mat-card-content>
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.description }}</p>
+          </mat-card-content>
+          
+          <mat-card-actions align="end">
+            <button mat-button [color]="action.color">
+              Accéder
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="activity-section" *ngIf="recentAbsences.length > 0">
+      <h2>Activité Récente</h2>
+      <mat-card class="activity-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>history</mat-icon>
+          <mat-card-title>Absences de la Semaine</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div *ngFor="let report of recentAbsences" class="absence-item">
+            <div class="absence-date">{{ report.date | date:'dd/MM/yyyy' }}</div>
+            <div class="absence-stats">
+              <span class="absence-count">{{ report.totalAbsences }} absences</span>
+              <span class="absence-rate">{{ report.absenteeismRate }}%</span>
+            </div>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions align="end">
+          <button mat-button color="primary" (click)="navigateTo('/director/stats')">
+            Voir Détails
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </section>
+
+  </div>
+</div>

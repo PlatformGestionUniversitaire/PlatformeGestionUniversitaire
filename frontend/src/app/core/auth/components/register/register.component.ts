@@ -81,7 +81,7 @@ export class RegisterComponent implements OnInit {
         console.log('Register data:', this.registerForm.value);
         
         // Success - navigate to login or dashboard
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/login']);
         this.isLoading = false;
       }, 1500);
     } else {

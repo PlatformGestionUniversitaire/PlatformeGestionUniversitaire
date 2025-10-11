@@ -1,0 +1,486 @@
+.referentials {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--brand-dark-blue) 0%, var(--brand-light-blue) 100%);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+/* Floating Shapes Background */
+.floating-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+}
+
+.shape-1 {
+  width: 250px;
+  height: 250px;
+  top: 20%;
+  left: -120px;
+  animation: float 19s infinite ease-in-out;
+}
+
+.shape-2 {
+  width: 180px;
+  height: 180px;
+  bottom: 20%;
+  right: -80px;
+  animation: float 23s infinite ease-in-out reverse;
+}
+
+/* Header */
+.page-header {
+  position: relative;
+  z-index: 10;
+  padding: 2rem 1.5rem 1rem;
+  text-align: center;
+  color: var(--brand-white);
+}
+
+.header-content h1 {
+  font-size: 2.3rem;
+  margin: 0 0 0.25rem 0;
+  font-weight: 700;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  z-index: 10;
+  position: relative;
+}
+
+.loading-container ::ng-deep .mat-mdc-progress-spinner circle {
+  stroke: var(--brand-white);
+}
+
+/* Content */
+.content-container {
+  position: relative;
+  z-index: 10;
+  padding: 0 1.5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tabs */
+.referentials-tabs {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.tab-content {
+  padding: 1.5rem;
+}
+
+/* Cards */
+.management-card {
+  background: rgba(255,255,255,0.98);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-actions {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Tables */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.subjects-table,
+.groups-table {
+  width: 100%;
+  background: white;
+}
+
+.subjects-table th,
+.groups-table th {
+  background: var(--brand-dark-blue);
+  color: white;
+  font-weight: 600;
+}
+
+.subjects-table td,
+.subjects-table th,
+.groups-table td,
+.groups-table th {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.subjects-table tr:hover,
+.groups-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* Subject Table Specific */
+.subject-code {
+  font-weight: 600;
+  color: var(--brand-dark-blue);
+  font-family: 'Courier New', monospace;
+  background: #f8f9fa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.subject-name {
+  font-weight: 500;
+  color: var(--brand-dark-blue);
+  margin-bottom: 0.25rem;
+}
+
+.subject-description {
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.prerequisites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.prerequisite-chip {
+  font-size: 0.8rem;
+  height: 24px;
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.no-prereq {
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Group Table Specific */
+.group-code {
+  font-weight: 600;
+  color: var(--brand-dark-blue);
+  font-family: 'Courier New', monospace;
+  background: #f8f9fa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.group-name {
+  font-weight: 500;
+  color: var(--brand-dark-blue);
+}
+
+.student-count {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.student-count .count {
+  font-weight: 600;
+  color: var(--brand-dark-blue);
+  font-size: 1.1rem;
+}
+
+.student-count .capacity {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.capacity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 80px;
+}
+
+.capacity-bar {
+  flex: 1;
+}
+
+.capacity-text {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}
+
+.group-subjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.subject-chip {
+  font-size: 0.75rem;
+  height: 22px;
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.more-subjects {
+  font-size: 0.75rem;
+  height: 22px;
+}
+
+/* Menu Actions */
+.delete-action {
+  color: #dc3545 !important;
+}
+
+/* Statistics Tab */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.98);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+}
+
+.stat-icon.subjects {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-icon.groups {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stat-icon.credits {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Semester Stats */
+.semester-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.semester-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid var(--brand-light-blue);
+}
+
+.semester-label {
+  font-weight: 500;
+  color: var(--brand-dark-blue);
+}
+
+.semester-count {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Group Stats */
+.group-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--brand-dark-blue);
+  line-height: 1;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Credits Stats */
+.credits-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+.credit-item {
+  text-align: center;
+  flex: 1;
+}
+
+.credit-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--brand-dark-blue);
+  line-height: 1;
+}
+
+.credit-label {
+  color: #666;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { 
+    transform: translate(0,0) rotate(0deg); 
+  }
+  33% { 
+    transform: translate(25px,-25px) rotate(120deg); 
+  }
+  66% { 
+    transform: translate(-15px,15px) rotate(240deg); 
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1.5rem 1rem 1rem;
+  }
+  
+  .header-content h1 {
+    font-size: 1.9rem;
+  }
+  
+  .content-container {
+    padding: 0 1rem 1.5rem;
+  }
+  
+  .tab-content {
+    padding: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .subjects-table td,
+  .subjects-table th,
+  .groups-table td,
+  .groups-table th {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .group-stats,
+  .credits-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .semester-stats {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 1.6rem;
+  }
+  
+  .card-actions {
+    justify-content: center;
+  }
+  
+  .stat-value,
+  .credit-value {
+    font-size: 1.5rem;
+  }
+  
+  .prerequisites,
+  .group-subjects {
+    justify-content: center;
+  }
+}
+
+/* Material Angular Overrides */
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab-header {
+  background: var(--brand-dark-blue);
+}
+
+::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  color: rgba(255,255,255,0.7);
+}
+
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: white;
+}
+
+::ng-deep .mat-mdc-card {
+  --mdc-elevated-card-container-elevation: none !important;
+}
+
+::ng-deep .mat-mdc-menu-content {
+  padding: 0;
+}
+
+::ng-deep .mat-mdc-menu-item {
+  min-height: 40px;
+}
+
+/* Custom Filter Pipe (if needed) */
+.semester-stats .semester-item:nth-child(odd) {
+  background: #f0f8ff;
+}

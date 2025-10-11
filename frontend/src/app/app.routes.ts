@@ -16,7 +16,19 @@ export const routes: Routes = [
 	// Feature areas (lazy-loaded standalone dashboards)
 	{ path: 'student', loadComponent: () => import('./features/student/pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent) },
 	{ path: 'teacher', loadComponent: () => import('./features/teacher/pages/teacher-dashboard/teacher-dashboard.component').then(m => m.TeacherDashboardComponent) },
-	{ path: 'director', loadComponent: () => import('./features/director/pages/director-dashboard/director-dashboard.component').then(m => m.DirectorDashboardComponent) },
+	{ 
+		path: 'director',
+		children: [
+			{ path: '', loadComponent: () => import('./features/director/pages/director-dashboard/director-dashboard.component').then(m => m.DirectorDashboardComponent) },
+			{ path: 'dashboard', loadComponent: () => import('./features/director/pages/director-dashboard/director-dashboard.component').then(m => m.DirectorDashboardComponent) },
+			{ path: 'timetable', loadComponent: () => import('./features/director/pages/timetable-page/timetable-page.component').then(m => m.TimetablePageComponent) },
+			{ path: 'stats', loadComponent: () => import('./features/director/pages/stats-page/stats-page.component').then(m => m.StatsPageComponent) },
+			{ path: 'subjects', loadComponent: () => import('./features/director/pages/referentials-page/referentials-page.component').then(m => m.ReferentialsPageComponent) },
+			{ path: 'groups', loadComponent: () => import('./features/director/pages/referentials-page/referentials-page.component').then(m => m.ReferentialsPageComponent) },
+			{ path: 'makeup', loadComponent: () => import('./features/director/pages/makeup-page/makeup-page.component').then(m => m.MakeupPageComponent) },
+			{ path: 'conflicts', loadComponent: () => import('./features/director/pages/conflicts-page/conflicts-page.component').then(m => m.ConflictsPageComponent) }
+		]
+	},
 	{ path: 'admin', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
 
 	{ path: '**', loadComponent: () => import('./components/not-found/not-found.component').then(m => m.NotFoundComponent) }
