@@ -1,0 +1,496 @@
+.timetable-container {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--brand-dark-blue) 0%, var(--brand-light-blue) 100%);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  overflow-x: hidden;
+  padding: 2rem 1.5rem;
+}
+
+/* Floating Shapes Background */
+.floating-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+}
+
+.shape-1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: -140px;
+  animation: float 20s infinite ease-in-out;
+}
+
+.shape-2 {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  right: -90px;
+  animation: float 15s infinite ease-in-out reverse;
+}
+
+.shape-3 {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  left: 10%;
+  animation: float 18s infinite ease-in-out;
+}
+
+/* Header */
+.timetable-header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  color: var(--brand-white);
+  margin-bottom: 2rem;
+}
+
+.header-content h1 {
+  font-size: 2.5rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 800;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Filters Section */
+.filters-section {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 2rem;
+}
+
+.filters-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.filters-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.actions-group {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Timetable Content */
+.timetable-content {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 2rem;
+}
+
+.timetable-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.timetable-grid {
+  display: grid;
+  grid-template-columns: 120px repeat(5, 1fr);
+  gap: 1px;
+  background: #e0e0e0;
+}
+
+.header-cell {
+  background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue));
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.day-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.day-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.day-date {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.time-slot {
+  background: #f8f9fa;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--brand-dark-blue);
+  border-right: 2px solid #e0e0e0;
+}
+
+.time-range {
+  writing-mode: horizontal-tb;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.course-cell {
+  background: white;
+  min-height: 80px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.course-cell.has-course {
+  background: transparent;
+}
+
+.course-cell.current-time {
+  background: rgba(255, 235, 59, 0.1);
+  border: 2px solid var(--brand-yellow);
+}
+
+.course-card {
+  height: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.course-lecture {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid var(--brand-light-blue);
+}
+
+.course-td {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 4px solid #4caf50;
+}
+
+.course-tp {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
+  border-left: 4px solid #ff9800;
+}
+
+.course-subject {
+  font-weight: 700;
+  color: var(--brand-dark-blue);
+  font-size: 0.9rem;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+.course-group {
+  background: rgba(255,255,255,0.8);
+  color: var(--brand-dark-blue);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.course-room {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #666;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.course-room mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.course-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.course-card:hover .course-actions {
+  opacity: 1;
+}
+
+.course-actions button {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+}
+
+.course-actions mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Summary Section */
+.summary-section {
+  position: relative;
+  z-index: 10;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: var(--brand-dark-blue);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.makeup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.makeup-item {
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid var(--brand-yellow);
+}
+
+.makeup-subject {
+  font-weight: 600;
+  color: var(--brand-dark-blue);
+  margin-bottom: 0.25rem;
+}
+
+.makeup-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.no-makeups {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { 
+    transform: translate(0,0) rotate(0deg); 
+  }
+  33% { 
+    transform: translate(30px,-30px) rotate(120deg); 
+  }
+  66% { 
+    transform: translate(-20px,20px) rotate(240deg); 
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .timetable-grid {
+    grid-template-columns: 100px repeat(5, 1fr);
+  }
+  
+  .time-range {
+    font-size: 0.8rem;
+  }
+  
+  .course-subject {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .timetable-container {
+    padding: 1rem;
+  }
+  
+  .header-content h1 {
+    font-size: 2rem;
+  }
+  
+  .filters-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .actions-group {
+    justify-content: center;
+  }
+  
+  .timetable-grid {
+    grid-template-columns: 80px repeat(5, 1fr);
+    font-size: 0.8rem;
+  }
+  
+  .time-slot {
+    padding: 0.5rem;
+  }
+  
+  .course-card {
+    padding: 0.5rem;
+  }
+  
+  .course-subject {
+    font-size: 0.75rem;
+  }
+  
+  .course-group {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 1.6rem;
+  }
+  
+  .timetable-grid {
+    grid-template-columns: 60px repeat(2, 1fr);
+    gap: 0.5px;
+  }
+  
+  .day-header {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  
+  .day-name {
+    font-size: 0.9rem;
+  }
+  
+  .day-date {
+    font-size: 0.8rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .floating-shapes,
+  .filters-section,
+  .summary-section,
+  .course-actions {
+    display: none !important;
+  }
+  
+  .timetable-container {
+    background: white !important;
+    min-height: auto;
+    padding: 1rem;
+  }
+  
+  .timetable-header {
+    color: black !important;
+    margin-bottom: 1rem;
+  }
+  
+  .header-content h1 {
+    text-shadow: none !important;
+    color: black !important;
+  }
+  
+  .subtitle {
+    color: black !important;
+  }
+  
+  .timetable-card {
+    background: white !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Material Angular Overrides */
+::ng-deep .mat-mdc-card {
+  --mdc-elevated-card-container-elevation: none !important;
+}
+
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-button .mat-icon {
+  margin-right: 0.5rem;
+}

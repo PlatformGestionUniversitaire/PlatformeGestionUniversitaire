@@ -1,1 +1,196 @@
-<div class="teacher-dashboard">Teacher Dashboard</div>
+<div class="teacher-dashboard">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Tableau de Bord Enseignant</h1>
+      <p class="subtitle">Gérez vos cours et vos étudiants</p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content">
+    
+    <!-- Statistics Overview -->
+    <section class="stats-section">
+      <h2>Aperçu de vos Cours</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.todayClasses }}</div>
+            <div class="stat-label">Cours Aujourd'hui</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalStudents }}</div>
+            <div class="stat-label">Mes Étudiants</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>book</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalSubjects }}</div>
+            <div class="stat-label">Matières</div>
+          </div>
+        </div>
+
+        <div class="stat-card warning" *ngIf="stats.pendingAbsences > 0">
+          <div class="stat-icon">
+            <mat-icon>notification_important</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.pendingAbsences }}</div>
+            <div class="stat-label">Absences à Valider</div>
+          </div>
+        </div>
+
+        <div class="stat-card" *ngIf="stats.makeupSessions > 0">
+          <div class="stat-icon">
+            <mat-icon>event_note</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.makeupSessions }}</div>
+            <div class="stat-label">Rattrapages Prévus</div>
+          </div>
+        </div>
+
+        <div class="stat-card" *ngIf="stats.unreadMessages > 0">
+          <div class="stat-icon">
+            <mat-icon>mail</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.unreadMessages }}</div>
+            <div class="stat-label">Messages Non Lus</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <h2>Actions Rapides</h2>
+      <div class="actions-grid">
+        <mat-card 
+          *ngFor="let action of quickActions" 
+          class="action-card" 
+          [class]="'action-' + action.color"
+          (click)="navigateTo(action.route)">
+          
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>{{ action.icon }}</mat-icon>
+              <span *ngIf="action.badge" class="action-badge">{{ action.badge }}</span>
+            </div>
+          </div>
+          
+          <mat-card-content>
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.description }}</p>
+          </mat-card-content>
+          
+          <mat-card-actions align="end">
+            <button mat-button [color]="action.color">
+              Accéder
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </section>
+
+    <!-- Today's Schedule -->
+    <section class="schedule-section" *ngIf="todaySchedule.length > 0">
+      <h2>Emploi du Temps d'Aujourd'hui</h2>
+      <mat-card class="schedule-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>today</mat-icon>
+          <mat-card-title>{{ currentDate | date:'EEEE dd MMMM yyyy' }}</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div *ngFor="let course of todaySchedule" class="course-item">
+            <div class="course-time">
+              <span class="time-start">{{ course.startTime }}</span>
+              <span class="time-separator">-</span>
+              <span class="time-end">{{ course.endTime }}</span>
+            </div>
+            <div class="course-details">
+              <div class="course-subject">{{ course.subject }}</div>
+              <div class="course-info">
+                <span class="course-group">{{ course.group }}</span>
+                <span class="course-room">Salle {{ course.room }}</span>
+              </div>
+            </div>
+            <div class="course-actions">
+              <button mat-icon-button color="primary" (click)="markAbsence(course)" matTooltip="Signaler une absence">
+                <mat-icon>person_off</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions align="end">
+          <button mat-button color="primary" (click)="navigateTo('/teacher/timetable')">
+            Voir Emploi Complet
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </section>
+
+    <!-- Recent Messages -->
+    <section class="messages-section" *ngIf="recentMessages.length > 0">
+      <h2>Messages Récents</h2>
+      <mat-card class="messages-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>forum</mat-icon>
+          <mat-card-title>Messagerie</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div *ngFor="let message of recentMessages" class="message-item">
+            <div class="message-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="message-content">
+              <div class="message-sender">{{ message.senderName }}</div>
+              <div class="message-subject">{{ message.subject }}</div>
+              <div class="message-date">{{ message.date | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+            <div class="message-status">
+              <mat-icon *ngIf="!message.read" class="unread-icon">mark_email_unread</mat-icon>
+            </div>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions align="end">
+          <button mat-button color="primary" (click)="navigateTo('/teacher/messages')">
+            Voir Tous les Messages
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </section>
+
+  </div>
+</div>

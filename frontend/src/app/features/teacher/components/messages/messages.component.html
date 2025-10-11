@@ -1,0 +1,274 @@
+<div class="messages-container">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="messages-header">
+    <div class="header-content">
+      <h1>Messagerie Interne</h1>
+      <p class="subtitle">Communiquez avec vos étudiants et collègues</p>
+    </div>
+  </div>
+
+  <!-- Messages Content -->
+  <div class="messages-content">
+    <div class="messages-layout">
+      
+      <!-- Sidebar -->
+      <div class="messages-sidebar">
+        <mat-card class="sidebar-card">
+          <mat-card-content>
+            <div class="sidebar-header">
+              <button mat-raised-button color="primary" (click)="composeMessage()" class="compose-btn">
+                <mat-icon>edit</mat-icon>
+                Nouveau Message
+              </button>
+            </div>
+            
+            <div class="sidebar-menu">
+              <div class="menu-item" 
+                   [class.active]="selectedFolder === 'inbox'"
+                   (click)="selectFolder('inbox')">
+                <mat-icon>inbox</mat-icon>
+                <span>Boîte de Réception</span>
+                <span *ngIf="unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
+              </div>
+              
+              <div class="menu-item" 
+                   [class.active]="selectedFolder === 'sent'"
+                   (click)="selectFolder('sent')">
+                <mat-icon>send</mat-icon>
+                <span>Messages Envoyés</span>
+              </div>
+              
+              <div class="menu-item" 
+                   [class.active]="selectedFolder === 'drafts'"
+                   (click)="selectFolder('drafts')">
+                <mat-icon>drafts</mat-icon>
+                <span>Brouillons</span>
+                <span *ngIf="draftsCount > 0" class="draft-badge">{{ draftsCount }}</span>
+              </div>
+              
+              <div class="menu-item" 
+                   [class.active]="selectedFolder === 'archive'"
+                   (click)="selectFolder('archive')">
+                <mat-icon>archive</mat-icon>
+                <span>Archivés</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Messages List -->
+      <div class="messages-list" *ngIf="!selectedMessage && !showCompose">
+        <mat-card class="list-card">
+          <mat-card-header>
+            <mat-card-title>{{ getFolderTitle() }}</mat-card-title>
+            <div class="list-actions">
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Rechercher</mat-label>
+                <input matInput [(ngModel)]="searchQuery" (input)="filterMessages()" placeholder="Rechercher dans les messages...">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              <button mat-icon-button (click)="refreshMessages()" matTooltip="Actualiser">
+                <mat-icon>refresh</mat-icon>
+              </button>
+            </div>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div *ngIf="filteredMessages.length > 0; else noMessages" class="message-items">
+              <div *ngFor="let message of filteredMessages" 
+                   class="message-item" 
+                   [class.unread]="!message.read"
+                   (click)="selectMessage(message)">
+                
+                <div class="message-avatar">
+                  <mat-icon>{{ message.fromMe ? 'send' : 'person' }}</mat-icon>
+                </div>
+                
+                <div class="message-content">
+                  <div class="message-sender">
+                    {{ message.fromMe ? 'À: ' + message.recipientName : message.senderName }}
+                  </div>
+                  <div class="message-subject">{{ message.subject }}</div>
+                  <div class="message-preview">{{ message.preview }}</div>
+                </div>
+                
+                <div class="message-meta">
+                  <div class="message-date">{{ formatDate(message.date) }}</div>
+                  <div class="message-actions">
+                    <button mat-icon-button (click)="toggleImportant(message, $event)" 
+                            [class.important]="message.important"
+                            matTooltip="Important">
+                      <mat-icon>{{ message.important ? 'star' : 'star_border' }}</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="archiveMessage(message, $event)" matTooltip="Archiver">
+                      <mat-icon>archive</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noMessages>
+              <div class="no-messages">
+                <mat-icon>{{ getNoMessagesIcon() }}</mat-icon>
+                <p>{{ getNoMessagesText() }}</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Message Detail -->
+      <div class="message-detail" *ngIf="selectedMessage && !showCompose">
+        <mat-card class="detail-card">
+          <mat-card-header>
+            <div class="detail-header">
+              <button mat-icon-button (click)="goBackToList()" matTooltip="Retour">
+                <mat-icon>arrow_back</mat-icon>
+              </button>
+              <div class="detail-title">
+                <h3>{{ selectedMessage.subject }}</h3>
+              </div>
+              <div class="detail-actions">
+                <button mat-icon-button (click)="replyToMessage()" matTooltip="Répondre">
+                  <mat-icon>reply</mat-icon>
+                </button>
+                <button mat-icon-button (click)="forwardMessage()" matTooltip="Transférer">
+                  <mat-icon>forward</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteMessage()" matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="message-info">
+              <div class="sender-info">
+                <div class="sender-avatar">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div class="sender-details">
+                  <div class="sender-name">{{ selectedMessage.senderName }}</div>
+                  <div class="sender-email">{{ selectedMessage.senderEmail }}</div>
+                  <div class="message-date-full">{{ selectedMessage.date | date:'EEEE dd MMMM yyyy à HH:mm' }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="message-body" [innerHTML]="selectedMessage.body"></div>
+            
+            <div *ngIf="(selectedMessage?.attachments?.length ?? 0) > 0" class="message-attachments">
+              <h4>Pièces jointes</h4>
+              <div class="attachment-list">
+                <div *ngFor="let attachment of selectedMessage.attachments" class="attachment-item">
+                  <mat-icon>attach_file</mat-icon>
+                  <span>{{ attachment.name }}</span>
+                  <button mat-icon-button (click)="downloadAttachment(attachment)">
+                    <mat-icon>download</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Compose Message -->
+      <div class="message-compose" *ngIf="showCompose">
+        <mat-card class="compose-card">
+          <mat-card-header>
+            <div class="compose-header">
+              <button mat-icon-button (click)="cancelCompose()" matTooltip="Fermer">
+                <mat-icon>close</mat-icon>
+              </button>
+              <h3>{{ composeMode === 'reply' ? 'Répondre' : composeMode === 'forward' ? 'Transférer' : 'Nouveau Message' }}</h3>
+            </div>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <form [formGroup]="composeForm" (ngSubmit)="sendMessage()">
+              <div class="compose-form">
+                
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Destinataire</mat-label>
+                    <mat-select formControlName="recipients" multiple required>
+                      <mat-optgroup *ngFor="let group of recipientGroups" [label]="group.label">
+                        <mat-option *ngFor="let recipient of group.recipients" [value]="recipient.id">
+                          {{ recipient.name }} ({{ recipient.email }})
+                        </mat-option>
+                      </mat-optgroup>
+                    </mat-select>
+                    <mat-error *ngIf="composeForm.get('recipients')?.hasError('required')">
+                      Veuillez sélectionner au moins un destinataire
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Sujet</mat-label>
+                    <input matInput formControlName="subject" required placeholder="Sujet du message">
+                    <mat-error *ngIf="composeForm.get('subject')?.hasError('required')">
+                      Le sujet est obligatoire
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Message</mat-label>
+                    <textarea matInput rows="10" formControlName="body" required 
+                             placeholder="Écrivez votre message ici..."></textarea>
+                    <mat-error *ngIf="composeForm.get('body')?.hasError('required')">
+                      Le message ne peut pas être vide
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <div class="file-upload" (click)="fileInput.click()">
+                    <input #fileInput type="file" multiple (change)="onFilesSelected($event)" style="display: none;">
+                    <mat-icon>attach_file</mat-icon>
+                    <span>Ajouter des pièces jointes</span>
+                  </div>
+                  
+                  <div *ngIf="attachedFiles.length > 0" class="attached-files">
+                    <div *ngFor="let file of attachedFiles" class="attached-file">
+                      <mat-icon>insert_drive_file</mat-icon>
+                      <span>{{ file.name }}</span>
+                      <button mat-icon-button (click)="removeFile(file)" type="button">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="compose-actions">
+                <button mat-button type="button" (click)="saveDraft()">
+                  Enregistrer en Brouillon
+                </button>
+                <button mat-raised-button color="primary" type="submit" 
+                        [disabled]="composeForm.invalid || isSending">
+                  <mat-icon *ngIf="isSending">hourglass_empty</mat-icon>
+                  {{ isSending ? 'Envoi...' : 'Envoyer' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,271 @@
+<div class="absences-container">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="absences-header">
+    <div class="header-content">
+      <h1>Gestion des Absences</h1>
+      <p class="subtitle">Signalez vos absences et validez celles de vos étudiants</p>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-section">
+    <mat-card class="tabs-card">
+      <mat-card-content>
+        <mat-tab-group [(selectedIndex)]="selectedTab" (selectedTabChange)="onTabChange($event)">
+          
+          <!-- Signaler une Absence -->
+          <mat-tab label="Signaler une Absence">
+            <div class="tab-content">
+              <div class="form-section">
+                <h3>Déclarer une Absence</h3>
+                <form [formGroup]="absenceForm" (ngSubmit)="submitAbsence()">
+                  
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Date d'absence</mat-label>
+                      <input matInput [matDatepicker]="picker" formControlName="date" required>
+                      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-datepicker #picker></mat-datepicker>
+                      <mat-error *ngIf="absenceForm.get('date')?.hasError('required')">
+                        La date est obligatoire
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="half-width">
+                      <mat-label>Heure de début</mat-label>
+                      <input matInput type="time" formControlName="startTime" required>
+                      <mat-error *ngIf="absenceForm.get('startTime')?.hasError('required')">
+                        L'heure de début est obligatoire
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="half-width">
+                      <mat-label>Heure de fin</mat-label>
+                      <input matInput type="time" formControlName="endTime" required>
+                      <mat-error *ngIf="absenceForm.get('endTime')?.hasError('required')">
+                        L'heure de fin est obligatoire
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Cours concerné</mat-label>
+                      <mat-select formControlName="courseId" required>
+                        <mat-option *ngFor="let course of myCourses" [value]="course.id">
+                          {{ course.subject }} - {{ course.group }} ({{ course.time }})
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="absenceForm.get('courseId')?.hasError('required')">
+                        Veuillez sélectionner un cours
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Motif de l'absence</mat-label>
+                      <mat-select formControlName="reason" required>
+                        <mat-option value="medical">Raison médicale</mat-option>
+                        <mat-option value="family">Raison familiale</mat-option>
+                        <mat-option value="professional">Raison professionnelle</mat-option>
+                        <mat-option value="transport">Problème de transport</mat-option>
+                        <mat-option value="other">Autre</mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="absenceForm.get('reason')?.hasError('required')">
+                        Veuillez sélectionner un motif
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Commentaire (optionnel)</mat-label>
+                      <textarea matInput rows="3" formControlName="comment" 
+                               placeholder="Précisions sur l'absence..."></textarea>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="file-upload">
+                      <label for="justificationFile">Justificatif (optionnel)</label>
+                      <input type="file" id="justificationFile" 
+                             (change)="onFileSelected($event)" 
+                             accept=".pdf,.jpg,.jpeg,.png">
+                      <mat-icon>attach_file</mat-icon>
+                      <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+                    </div>
+                  </div>
+
+                  <div class="form-actions">
+                    <button mat-raised-button type="button" (click)="resetForm()">
+                      Annuler
+                    </button>
+                    <button mat-raised-button color="primary" type="submit" 
+                            [disabled]="absenceForm.invalid || isSubmitting">
+                      <mat-icon *ngIf="isSubmitting">hourglass_empty</mat-icon>
+                      {{ isSubmitting ? 'Envoi...' : 'Signaler l\'Absence' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Mes Absences -->
+          <mat-tab label="Mes Absences">
+            <div class="tab-content">
+              <div class="absences-list">
+                <h3>Historique de mes Absences</h3>
+                
+                <div class="filters">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Période</mat-label>
+                    <mat-select [(value)]="selectedPeriod" (selectionChange)="filterMyAbsences()">
+                      <mat-option value="week">Cette semaine</mat-option>
+                      <mat-option value="month">Ce mois</mat-option>
+                      <mat-option value="semester">Ce semestre</mat-option>
+                      <mat-option value="all">Toutes</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div *ngIf="myAbsences.length > 0; else noMyAbsences" class="absence-cards">
+                  <mat-card *ngFor="let absence of myAbsences" class="absence-card">
+                    <mat-card-header>
+                      <div mat-card-avatar class="absence-avatar">
+                        <mat-icon>event_busy</mat-icon>
+                      </div>
+                      <mat-card-title>{{ absence.course }}</mat-card-title>
+                      <mat-card-subtitle>{{ absence.date | date:'EEEE dd MMMM yyyy' }}</mat-card-subtitle>
+                    </mat-card-header>
+                    
+                    <mat-card-content>
+                      <div class="absence-details">
+                        <div class="detail-item">
+                          <mat-icon>schedule</mat-icon>
+                          <span>{{ absence.startTime }} - {{ absence.endTime }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <mat-icon>info</mat-icon>
+                          <span>{{ getReasonLabel(absence.reason) }}</span>
+                        </div>
+                        <div *ngIf="absence.comment" class="detail-item">
+                          <mat-icon>comment</mat-icon>
+                          <span>{{ absence.comment }}</span>
+                        </div>
+                      </div>
+                      
+                      <div class="absence-status">
+                        <mat-chip [color]="getStatusColor(absence.status)" selected>
+                          {{ getStatusLabel(absence.status) }}
+                        </mat-chip>
+                      </div>
+                    </mat-card-content>
+                    
+                    <mat-card-actions *ngIf="absence.status === 'pending'">
+                      <button mat-button color="warn" (click)="cancelAbsence(absence.id)">
+                        Annuler
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                </div>
+
+                <ng-template #noMyAbsences>
+                  <div class="no-data">
+                    <mat-icon>event_available</mat-icon>
+                    <p>Aucune absence déclarée pour la période sélectionnée</p>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Validation des Absences -->
+          <mat-tab label="Validation Absences Étudiants">
+            <div class="tab-content">
+              <div class="validation-section">
+                <h3>Demandes d'Absences à Valider</h3>
+                
+                <div class="filters">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Cours</mat-label>
+                    <mat-select [(value)]="selectedCourseFilter" (selectionChange)="filterStudentAbsences()">
+                      <mat-option value="">Tous les cours</mat-option>
+                      <mat-option *ngFor="let course of myCourses" [value]="course.id">
+                        {{ course.subject }} - {{ course.group }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div *ngIf="pendingStudentAbsences.length > 0; else noPendingAbsences" class="validation-cards">
+                  <mat-card *ngFor="let absence of pendingStudentAbsences" class="validation-card">
+                    <mat-card-header>
+                      <div mat-card-avatar class="student-avatar">
+                        <mat-icon>person</mat-icon>
+                      </div>
+                      <mat-card-title>{{ absence.studentName }}</mat-card-title>
+                      <mat-card-subtitle>{{ absence.course }} - {{ absence.date | date:'dd/MM/yyyy' }}</mat-card-subtitle>
+                    </mat-card-header>
+                    
+                    <mat-card-content>
+                      <div class="absence-details">
+                        <div class="detail-item">
+                          <mat-icon>schedule</mat-icon>
+                          <span>{{ absence.startTime }} - {{ absence.endTime }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <mat-icon>info</mat-icon>
+                          <span>{{ getReasonLabel(absence.reason) }}</span>
+                        </div>
+                        <div *ngIf="absence.comment" class="detail-item">
+                          <mat-icon>comment</mat-icon>
+                          <span>{{ absence.comment }}</span>
+                        </div>
+                        <div *ngIf="absence.hasJustification" class="detail-item">
+                          <mat-icon>attach_file</mat-icon>
+                          <span>Justificatif fourni</span>
+                          <button mat-icon-button (click)="viewJustification(absence.id)">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                    
+                    <mat-card-actions>
+                      <button mat-button color="warn" (click)="rejectAbsence(absence.id)">
+                        <mat-icon>close</mat-icon>
+                        Refuser
+                      </button>
+                      <button mat-raised-button color="primary" (click)="approveAbsence(absence.id)">
+                        <mat-icon>check</mat-icon>
+                        Approuver
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                </div>
+
+                <ng-template #noPendingAbsences>
+                  <div class="no-data">
+                    <mat-icon>check_circle</mat-icon>
+                    <p>Aucune demande d'absence en attente de validation</p>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

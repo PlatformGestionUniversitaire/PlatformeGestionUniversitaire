@@ -1,0 +1,299 @@
+<div class="makeup-container">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="makeup-header">
+    <div class="header-content">
+      <h1>Séances de Rattrapage</h1>
+      <p class="subtitle">Planifiez et gérez vos sessions de rattrapage</p>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="makeup-content">
+    <mat-tab-group [(selectedIndex)]="selectedTab">
+      
+      <!-- Proposer un Rattrapage -->
+      <mat-tab label="Proposer un Rattrapage">
+        <div class="tab-content">
+          <div class="form-section">
+            <h3>Créer une Séance de Rattrapage</h3>
+            
+            <form [formGroup]="makeupForm" (ngSubmit)="submitMakeup()">
+              <div class="form-grid">
+                
+                <div class="form-group">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Cours concerné</mat-label>
+                    <mat-select formControlName="courseId" required>
+                      <mat-option *ngFor="let course of myCourses" [value]="course.id">
+                        {{ course.subject }} - {{ course.group }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="makeupForm.get('courseId')?.hasError('required')">
+                      Veuillez sélectionner un cours
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Date du rattrapage</mat-label>
+                    <input matInput [matDatepicker]="makeupPicker" formControlName="date" required>
+                    <mat-datepicker-toggle matSuffix [for]="makeupPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #makeupPicker></mat-datepicker>
+                    <mat-error *ngIf="makeupForm.get('date')?.hasError('required')">
+                      La date est obligatoire
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Heure de début</mat-label>
+                    <input matInput type="time" formControlName="startTime" required>
+                    <mat-error *ngIf="makeupForm.get('startTime')?.hasError('required')">
+                      L'heure de début est obligatoire
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Heure de fin</mat-label>
+                    <input matInput type="time" formControlName="endTime" required>
+                    <mat-error *ngIf="makeupForm.get('endTime')?.hasError('required')">
+                      L'heure de fin est obligatoire
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Salle</mat-label>
+                    <mat-select formControlName="room" required>
+                      <mat-option *ngFor="let room of availableRooms" [value]="room.id">
+                        Salle {{ room.number }} - {{ room.capacity }} places ({{ room.type }})
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="makeupForm.get('room')?.hasError('required')">
+                      Veuillez sélectionner une salle
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Type de séance</mat-label>
+                    <mat-select formControlName="type" required>
+                      <mat-option value="lecture">Cours Magistral</mat-option>
+                      <mat-option value="td">Travaux Dirigés</mat-option>
+                      <mat-option value="tp">Travaux Pratiques</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="makeupForm.get('type')?.hasError('required')">
+                      Veuillez sélectionner le type de séance
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group full-width">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Motif du rattrapage</mat-label>
+                    <textarea matInput rows="3" formControlName="reason" 
+                             placeholder="Expliquez la raison de ce rattrapage..." required></textarea>
+                    <mat-error *ngIf="makeupForm.get('reason')?.hasError('required')">
+                      Le motif est obligatoire
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group full-width">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Description du contenu (optionnel)</mat-label>
+                    <textarea matInput rows="3" formControlName="description" 
+                             placeholder="Décrivez le contenu de la séance..."></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group full-width">
+                  <div class="checkbox-group">
+                    <mat-checkbox formControlName="notifyStudents">
+                      Notifier automatiquement les étudiants
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button mat-button type="button" (click)="resetMakeupForm()">
+                  Annuler
+                </button>
+                <button mat-raised-button color="primary" type="submit" 
+                        [disabled]="makeupForm.invalid || isSubmitting">
+                  <mat-icon *ngIf="isSubmitting">hourglass_empty</mat-icon>
+                  {{ isSubmitting ? 'Création...' : 'Créer le Rattrapage' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Mes Rattrapages -->
+      <mat-tab label="Mes Rattrapages">
+        <div class="tab-content">
+          <div class="makeups-list">
+            <div class="list-header">
+              <h3>Mes Séances de Rattrapage</h3>
+              <div class="filters">
+                <mat-form-field appearance="outline">
+                  <mat-label>Période</mat-label>
+                  <mat-select [(value)]="selectedPeriod" (selectionChange)="filterMakeups()">
+                    <mat-option value="upcoming">À venir</mat-option>
+                    <mat-option value="past">Passées</mat-option>
+                    <mat-option value="all">Toutes</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div *ngIf="myMakeups.length > 0; else noMakeups" class="makeup-cards">
+              <mat-card *ngFor="let makeup of myMakeups" class="makeup-card" 
+                        [class]="'status-' + makeup.status">
+                <mat-card-header>
+                  <div mat-card-avatar class="makeup-avatar">
+                    <mat-icon>event_note</mat-icon>
+                  </div>
+                  <mat-card-title>{{ makeup.subject }}</mat-card-title>
+                  <mat-card-subtitle>
+                    {{ makeup.group }} - {{ makeup.date | date:'EEEE dd MMMM yyyy' }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <div class="makeup-details">
+                    <div class="detail-item">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ makeup.startTime }} - {{ makeup.endTime }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <mat-icon>location_on</mat-icon>
+                      <span>Salle {{ makeup.room }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <mat-icon>class</mat-icon>
+                      <span>{{ getTypeLabel(makeup.type) }}</span>
+                    </div>
+                    <div *ngIf="makeup.reason" class="detail-item">
+                      <mat-icon>info</mat-icon>
+                      <span>{{ makeup.reason }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="makeup-status">
+                    <mat-chip [color]="getStatusColor(makeup.status)" selected>
+                      {{ getStatusLabel(makeup.status) }}
+                    </mat-chip>
+                  </div>
+
+                  <div *ngIf="makeup.attendanceCount !== undefined" class="attendance-info">
+                    <div class="attendance-stat">
+                      <span class="stat-label">Présents</span>
+                      <span class="stat-value">{{ makeup.attendanceCount }}/{{ makeup.expectedCount }}</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
+                  <button mat-button (click)="viewMakeupDetails(makeup.id)">
+                    Détails
+                  </button>
+                  <button *ngIf="makeup.status === 'scheduled'" 
+                          mat-button color="primary" (click)="editMakeup(makeup.id)">
+                    Modifier
+                  </button>
+                  <button *ngIf="makeup.status === 'scheduled'" 
+                          mat-button color="warn" (click)="cancelMakeup(makeup.id)">
+                    Annuler
+                  </button>
+                  <button *ngIf="makeup.status === 'completed'" 
+                          mat-button (click)="viewAttendance(makeup.id)">
+                    Présences
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+
+            <ng-template #noMakeups>
+              <div class="no-data">
+                <mat-icon>event_available</mat-icon>
+                <p>Aucune séance de rattrapage pour la période sélectionnée</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Demandes d'Étudiants -->
+      <mat-tab label="Demandes d'Étudiants">
+        <div class="tab-content">
+          <div class="requests-section">
+            <h3>Demandes de Rattrapage des Étudiants</h3>
+            
+            <div *ngIf="studentRequests.length > 0; else noRequests" class="request-cards">
+              <mat-card *ngFor="let request of studentRequests" class="request-card">
+                <mat-card-header>
+                  <div mat-card-avatar class="student-avatar">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <mat-card-title>{{ request.studentName }}</mat-card-title>
+                  <mat-card-subtitle>
+                    {{ request.course }} - {{ request.requestDate | date:'dd/MM/yyyy' }}
+                  </mat-card-subtitle>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <div class="request-details">
+                    <div class="detail-item">
+                      <mat-icon>event_busy</mat-icon>
+                      <span>Cours manqué le {{ request.missedDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <mat-icon>info</mat-icon>
+                      <span>{{ request.reason }}</span>
+                    </div>
+                    <div *ngIf="request.preferredDates?.length" class="detail-item">
+                      <mat-icon>date_range</mat-icon>
+                      <span>Dates préférées: {{ request.preferredDates?.join(', ') }}</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
+                  <button mat-button color="warn" (click)="rejectRequest(request.id)">
+                    Refuser
+                  </button>
+                  <button mat-raised-button color="primary" (click)="acceptRequest(request.id)">
+                    Accepter
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+
+            <ng-template #noRequests>
+              <div class="no-data">
+                <mat-icon>check_circle</mat-icon>
+                <p>Aucune demande de rattrapage en attente</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

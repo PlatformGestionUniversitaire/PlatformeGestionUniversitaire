@@ -1,1 +1,255 @@
-<div class="messages">Messages</div>
+<div class="messages-container">
+  <!-- Header -->
+  <div class="messages-header">
+    <div class="header-left">
+      <h2>Messagerie Interne</h2>
+      <span class="unread-count" *ngIf="getUnreadThreadsCount() > 0">
+        {{ getUnreadThreadsCount() }} non lu(s)
+      </span>
+    </div>
+    <div class="header-actions">
+      <button class="new-message-btn" (click)="openNewMessageModal()">
+        <span class="btn-icon">✉️</span>
+        Nouveau Message
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="messages-content">
+    <!-- Threads List View -->
+    <div class="threads-section" *ngIf="currentView === 'threads'">
+      <!-- Search Bar -->
+      <div class="search-section">
+        <div class="search-input-container">
+          <input 
+            type="text" 
+            placeholder="Rechercher dans les conversations..."
+            [(ngModel)]="searchQuery"
+            class="search-input">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-spinner" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Chargement des conversations...</p>
+      </div>
+
+      <!-- Threads List -->
+      <div class="threads-list" *ngIf="!loading">
+        <div 
+          class="thread-item"
+          *ngFor="let thread of getFilteredThreads()"
+          [class.unread]="!thread.lastMessage.isRead"
+          (click)="selectThread(thread)">
+          
+          <div class="thread-avatar">
+            <div class="avatar-circle">
+              {{ getParticipantNames(thread.participants).charAt(0).toUpperCase() }}
+            </div>
+          </div>
+
+          <div class="thread-content">
+            <div class="thread-header">
+              <h4 class="participant-name">{{ getParticipantNames(thread.participants) }}</h4>
+              <span class="message-time">{{ formatMessageTime(thread.lastMessage.sentAt) }}</span>
+            </div>
+            <h5 class="thread-subject">{{ thread.subject }}</h5>
+            <p class="last-message">{{ thread.lastMessage.content }}</p>
+            <div class="thread-meta">
+              <span class="message-count">{{ thread.messagesCount }} message(s)</span>
+              <span class="unread-indicator" *ngIf="!thread.lastMessage.isRead"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="getFilteredThreads().length === 0 && !loading">
+          <div class="empty-icon">💬</div>
+          <h3>Aucune conversation trouvée</h3>
+          <p>Commencez une nouvelle conversation en cliquant sur "Nouveau Message"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages View -->
+    <div class="messages-section" *ngIf="currentView === 'messages' && selectedThread">
+      <!-- Conversation Header -->
+      <div class="conversation-header">
+        <button class="back-btn" (click)="backToThreads()">
+          <span class="back-icon">←</span>
+          Retour
+        </button>
+        <div class="conversation-info">
+          <h3>{{ selectedThread.subject }}</h3>
+          <p>Avec {{ getParticipantNames(selectedThread.participants) }}</p>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div class="messages-list-container">
+        <div class="messages-list">
+          <div 
+            class="message-item"
+            *ngFor="let message of messages"
+            [class.own-message]="isMessageFromCurrentUser(message)">
+            
+            <div class="message-avatar" *ngIf="!isMessageFromCurrentUser(message)">
+              <div class="avatar-circle">
+                {{ message.senderName.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+
+            <div class="message-content">
+              <div class="message-header">
+                <span class="sender-name">{{ message.senderName }}</span>
+                <span class="message-time">{{ formatMessageTime(message.sentAt) }}</span>
+              </div>
+              <div class="message-body">
+                <p>{{ message.content }}</p>
+                <div class="attachments" *ngIf="message.attachments && message.attachments.length > 0">
+                  <div class="attachment" *ngFor="let attachment of message.attachments">
+                    <span class="attachment-icon">📎</span>
+                    <span class="attachment-name">{{ attachment }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="message-avatar" *ngIf="isMessageFromCurrentUser(message)">
+              <div class="avatar-circle own">
+                Vous
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reply Form -->
+      <div class="reply-section">
+        <form [formGroup]="replyForm" (ngSubmit)="sendReply()">
+          <div class="reply-input-container">
+            <textarea 
+              formControlName="content"
+              placeholder="Tapez votre réponse..."
+              rows="3"
+              class="reply-input">
+            </textarea>
+            <button 
+              type="submit" 
+              class="send-btn"
+              [disabled]="replyForm.invalid || sendingMessage">
+              <span *ngIf="sendingMessage">📤</span>
+              <span *ngIf="!sendingMessage">➤</span>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="replyForm.get('content')?.invalid && replyForm.get('content')?.touched">
+            Le message doit contenir au moins 10 caractères
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Message Modal -->
+<div class="modal-overlay" *ngIf="showNewMessageModal" (click)="closeNewMessageModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Nouveau Message</h3>
+      <button class="close-btn" (click)="closeNewMessageModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <form [formGroup]="newMessageForm" (ngSubmit)="sendNewMessage()">
+        <div class="form-group">
+          <label>Destinataire *</label>
+          <div class="recipient-selector">
+            <button 
+              type="button" 
+              class="select-recipient-btn"
+              (click)="openContactsModal()">
+              {{ getSelectedRecipientName() }}
+              <span class="dropdown-icon">▼</span>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="newMessageForm.get('recipientId')?.invalid && newMessageForm.get('recipientId')?.touched">
+            Veuillez sélectionner un destinataire
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Sujet *</label>
+          <input 
+            type="text" 
+            id="subject"
+            formControlName="subject"
+            placeholder="Objet du message">
+          <div class="error-message" *ngIf="newMessageForm.get('subject')?.invalid && newMessageForm.get('subject')?.touched">
+            <span *ngIf="newMessageForm.get('subject')?.errors?.['required']">Le sujet est requis</span>
+            <span *ngIf="newMessageForm.get('subject')?.errors?.['minlength']">Le sujet doit contenir au moins 3 caractères</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="content">Message *</label>
+          <textarea 
+            id="content"
+            formControlName="content"
+            rows="6"
+            placeholder="Votre message...">
+          </textarea>
+          <div class="error-message" *ngIf="newMessageForm.get('content')?.invalid && newMessageForm.get('content')?.touched">
+            <span *ngIf="newMessageForm.get('content')?.errors?.['required']">Le message est requis</span>
+            <span *ngIf="newMessageForm.get('content')?.errors?.['minlength']">Le message doit contenir au moins 10 caractères</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeNewMessageModal()">
+            Annuler
+          </button>
+          <button 
+            type="submit" 
+            class="send-btn"
+            [disabled]="newMessageForm.invalid || sendingMessage">
+            <span *ngIf="sendingMessage">Envoi en cours...</span>
+            <span *ngIf="!sendingMessage">Envoyer</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Contacts Modal -->
+<div class="modal-overlay" *ngIf="showContactsModal" (click)="closeContactsModal()">
+  <div class="modal-content contacts-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Sélectionner un Destinataire</h3>
+      <button class="close-btn" (click)="closeContactsModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="contacts-list">
+        <div 
+          class="contact-item"
+          *ngFor="let contact of contacts"
+          (click)="selectRecipient(contact)">
+          <div class="contact-avatar">
+            <div class="avatar-circle">
+              {{ contact.name.charAt(0).toUpperCase() }}
+            </div>
+          </div>
+          <div class="contact-info">
+            <h4>{{ contact.name }}</h4>
+            <p>{{ contact.role | titlecase }}</p>
+            <small>{{ contact.email }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

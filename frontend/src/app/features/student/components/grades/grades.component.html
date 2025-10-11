@@ -1,1 +1,166 @@
-<div class="grades">Grades</div>
+<div class="grades-container">
+  <!-- Header -->
+  <div class="grades-header">
+    <h2>Mes Notes</h2>
+    <p>Consultez toutes vos notes et statistiques académiques</p>
+  </div>
+
+  <!-- Statistics Overview -->
+  <div class="statistics-overview" *ngIf="statistics">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>{{ statistics.overallGPA }}/20</h3>
+        <p>Moyenne Générale</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <h3>{{ statistics.semesterGPA }}/20</h3>
+        <p>Moyenne Semestre</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-content">
+        <h3>{{ getSubjectCount() }}</h3>
+        <p>Matières</p>
+      </div>
+    </div>
+    <div class="stat-card" [class]="statistics.isAtRiskOfElimination ? 'warning' : 'success'">
+      <div class="stat-icon">{{ statistics.isAtRiskOfElimination ? '⚠️' : '✅' }}</div>
+      <div class="stat-content">
+        <h3>{{ statistics.isAtRiskOfElimination ? 'Risque' : 'Bon' }}</h3>
+        <p>Statut Académique</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="semester">Semestre:</label>
+      <select id="semester" [(ngModel)]="selectedSemester" (change)="onSemesterChange()">
+        <option value="all">Tous les semestres</option>
+        <option *ngFor="let semester of semesters" [value]="semester">
+          Semestre {{ semester }}
+        </option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="course">Matière:</label>
+      <select id="course" [(ngModel)]="selectedCourse" (change)="onCourseChange()">
+        <option value="all">Toutes les matières</option>
+        <option *ngFor="let course of courses" [value]="course">
+          {{ course }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Semester Statistics -->
+  <div class="semester-stats" *ngIf="semesters.length > 0">
+    <h3>Statistiques par Semestre</h3>
+    <div class="semester-cards">
+      <div class="semester-card" *ngFor="let semester of semesters">
+        <h4>Semestre {{ semester }}</h4>
+        <div class="semester-info">
+          <div class="info-item">
+            <span class="label">Moyenne:</span>
+            <span class="value" [class]="calculateSemesterAverage(semester) >= 10 ? 'success' : 'warning'">
+              {{ calculateSemesterAverage(semester) }}/20
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="label">Notes:</span>
+            <span class="value">{{ getSemesterStats()[semester].count || 0 }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Réussies:</span>
+            <span class="value success">{{ getSemesterStats()[semester].passed || 0 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des notes...</p>
+  </div>
+
+  <!-- Grades Table -->
+  <div class="grades-section" *ngIf="!loading">
+    <h3>
+      Détail des Notes 
+      <span class="grade-count">({{ filteredGrades.length }} notes)</span>
+    </h3>
+    
+    <div class="grades-table-container">
+      <table class="grades-table" *ngIf="filteredGrades.length > 0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Matière</th>
+            <th>Type</th>
+            <th>Note</th>
+            <th>Coefficient</th>
+            <th>Semestre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let grade of filteredGrades" class="grade-row">
+            <td class="date-cell">{{ grade.date | date:'dd/MM/yyyy' }}</td>
+            <td class="course-cell">{{ grade.courseName }}</td>
+            <td class="type-cell">
+              <span class="grade-type-badge">{{ getGradeTypeDisplay(grade.examType) }}</span>
+            </td>
+            <td class="grade-cell">
+              <span class="grade-value" [class]="getGradeClass(grade.grade)">
+                {{ grade.grade }}/20
+              </span>
+            </td>
+            <td class="coefficient-cell">{{ grade.coefficient }}</td>
+            <td class="semester-cell">S{{ grade.semester }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredGrades.length === 0 && !loading">
+        <div class="empty-icon">📝</div>
+        <h3>Aucune note trouvée</h3>
+        <p>Aucune note ne correspond aux critères sélectionnés.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grade Legend -->
+  <div class="grade-legend">
+    <h4>Légende des Notes</h4>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-color excellent"></span>
+        <span>Excellent (16-20)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color very-good"></span>
+        <span>Très Bien (14-16)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color good"></span>
+        <span>Bien (12-14)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color satisfactory"></span>
+        <span>Assez Bien (10-12)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color needs-improvement"></span>
+        <span>Insuffisant (&lt;10)</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,161 @@
+<div class="timetable-container">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="timetable-header">
+    <div class="header-content">
+      <h1>Mon Emploi du Temps</h1>
+      <p class="subtitle">Planning hebdomadaire de vos cours</p>
+    </div>
+  </div>
+
+  <!-- Filters and Actions -->
+  <div class="filters-section">
+    <mat-card class="filters-card">
+      <mat-card-content>
+        <div class="filters-content">
+          <div class="filter-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Semaine</mat-label>
+              <mat-select [(value)]="selectedWeek" (selectionChange)="onWeekChange()">
+                <mat-option *ngFor="let week of weeks" [value]="week.value">
+                  {{ week.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Matière</mat-label>
+              <mat-select [(value)]="selectedSubject" (selectionChange)="onSubjectChange()">
+                <mat-option value="">Toutes les matières</mat-option>
+                <mat-option *ngFor="let subject of subjects" [value]="subject">
+                  {{ subject }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="actions-group">
+            <button mat-raised-button color="primary" (click)="exportTimetable()">
+              <mat-icon>download</mat-icon>
+              Exporter
+            </button>
+            <button mat-raised-button color="accent" (click)="printTimetable()">
+              <mat-icon>print</mat-icon>
+              Imprimer
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Timetable Grid -->
+  <div class="timetable-content">
+    <mat-card class="timetable-card">
+      <mat-card-content>
+        <div class="timetable-grid">
+          <!-- Time slots header -->
+          <div class="time-slot header-cell"></div>
+          <div *ngFor="let day of days" class="day-header header-cell">
+            <div class="day-name">{{ day.name }}</div>
+            <div class="day-date">{{ day.date | date:'dd/MM' }}</div>
+          </div>
+
+          <!-- Time slots and courses -->
+          <ng-container *ngFor="let timeSlot of timeSlots">
+            <div class="time-slot">
+              <div class="time-range">{{ timeSlot.start }} - {{ timeSlot.end }}</div>
+            </div>
+            
+            <div *ngFor="let day of days" class="course-cell" 
+                 [class.has-course]="getCourse(day.name, timeSlot.start)"
+                 [class.current-time]="isCurrentTime(day.name, timeSlot.start)">
+              
+              <div *ngIf="getCourse(day.name, timeSlot.start) as course" 
+                   class="course-card" 
+                   [class]="'course-' + course.type"
+                   (click)="viewCourseDetails(course)">
+                
+                <div class="course-subject">{{ course.subject }}</div>
+                <div class="course-group">{{ course.group }}</div>
+                <div class="course-room">
+                  <mat-icon>location_on</mat-icon>
+                  Salle {{ course.room }}
+                </div>
+                
+                <div class="course-actions">
+                  <button mat-icon-button (click)="markAbsence(course, $event)" 
+                          matTooltip="Signaler une absence">
+                    <mat-icon>person_off</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="scheduleMapping(course, $event)" 
+                          matTooltip="Programmer un rattrapage">
+                    <mat-icon>event_note</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Weekly Summary -->
+  <div class="summary-section">
+    <div class="summary-grid">
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>schedule</mat-icon>
+          <mat-card-title>Résumé Hebdomadaire</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-stats">
+            <div class="stat-item">
+              <span class="stat-label">Total d'heures</span>
+              <span class="stat-value">{{ weeklyStats.totalHours }}h</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Nombre de cours</span>
+              <span class="stat-value">{{ weeklyStats.totalCourses }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Groupes différents</span>
+              <span class="stat-value">{{ weeklyStats.uniqueGroups }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>event_note</mat-icon>
+          <mat-card-title>Rattrapages Prévus</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="upcomingMakeups.length > 0; else noMakeups" class="makeup-list">
+            <div *ngFor="let makeup of upcomingMakeups" class="makeup-item">
+              <div class="makeup-subject">{{ makeup.subject }}</div>
+              <div class="makeup-details">
+                <span class="makeup-date">{{ makeup.date | date:'dd/MM/yyyy' }}</span>
+                <span class="makeup-time">{{ makeup.time }}</span>
+                <span class="makeup-room">Salle {{ makeup.room }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noMakeups>
+            <p class="no-makeups">Aucun rattrapage prévu cette semaine</p>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

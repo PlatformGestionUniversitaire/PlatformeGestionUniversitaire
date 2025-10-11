@@ -1,1 +1,250 @@
-<div class="timetable">Timetable</div>
+<div class="timetable-container">
+  <!-- Header -->
+  <div class="timetable-header">
+    <div class="header-title">
+      <h1>📅 Mon Emploi du Temps</h1>
+      <p class="week-range">{{ getWeekDateRange() }}</p>
+    </div>
+    
+    <div class="header-actions">
+      <div class="week-navigation">
+        <button class="nav-btn" (click)="previousWeek()" [disabled]="loading">
+          ← Semaine précédente
+        </button>
+        <button class="current-btn" (click)="currentWeek()" [disabled]="loading">
+          Cette semaine
+        </button>
+        <button class="nav-btn" (click)="nextWeek()" [disabled]="loading">
+          Semaine suivante →
+        </button>
+      </div>
+      
+      <button class="refresh-btn" (click)="refresh()" [disabled]="loading">
+        🔄 Actualiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Chargement de l'emploi du temps...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
+    <button class="retry-btn" (click)="refresh()">Réessayer</button>
+  </div>
+
+  <!-- Timetable Content -->
+  <div *ngIf="!loading && !error" class="timetable-content">
+    
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">📚</div>
+        <div class="card-content">
+          <h3>{{ timetable.length }}</h3>
+          <p>Cours cette semaine</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="card-icon">⏰</div>
+        <div class="card-content">
+          <h3>{{ (timetable.length * 1.5) | number:'1.0-0' }}h</h3>
+          <p>Heures de cours</p>
+        </div>
+      </div>
+      
+      <div class="summary-card" *ngIf="hasModifiedCourses()">
+        <div class="card-icon">🔄</div>
+        <div class="card-content">
+          <h3>{{ getModifiedCoursesCount() }}</h3>
+          <p>Modifications</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Grid View -->
+    <div class="weekly-grid">
+      <div class="day-column" *ngFor="let day of weekDays">
+        <div class="day-header">
+          <h3>{{ day }}</h3>
+          <span class="hours-count" *ngIf="hasCoursesForDay(day)">
+            {{ getTotalHoursPerDay(day) | number:'1.1-1' }}h
+          </span>
+        </div>
+        
+        <div class="day-content">
+          <!-- Empty day -->
+          <div *ngIf="!hasCoursesForDay(day)" class="empty-day">
+            <span class="empty-icon">🌟</span>
+            <p>Pas de cours</p>
+          </div>
+          
+          <!-- Courses for the day -->
+          <div *ngFor="let course of weeklyTimetable[day]" 
+               class="course-slot"
+               [class]="getCourseTypeClass(course.courseType) + ' ' + getCourseStatusClass(course)"
+               (click)="onCourseClick(course)">
+            
+            <div class="course-time">
+              <span class="start-time">{{ course.startTime }}</span>
+              <span class="end-time">{{ course.endTime }}</span>
+            </div>
+            
+            <div class="course-info">
+              <h4 class="course-name">{{ course.courseName }}</h4>
+              <p class="teacher-name">{{ course.teacherName }}</p>
+              <p class="classroom">📍 {{ course.classroom }}</p>
+              
+              <div class="course-badges">
+                <span class="course-type-badge" [class]="getCourseTypeClass(course.courseType)">
+                  {{ course.courseType.toUpperCase() }}
+                </span>
+                
+                <span *ngIf="course.isCancelled" class="status-badge cancelled">
+                  ❌ Annulé
+                </span>
+                
+                <span *ngIf="course.isModified && !course.isCancelled" class="status-badge modified">
+                  🔄 Modifié
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List View for Mobile -->
+    <div class="mobile-list-view">
+      <div *ngFor="let day of weekDays" class="mobile-day-section">
+        <div class="mobile-day-header">
+          <h3>{{ day }}</h3>
+          <span class="mobile-hours-count" *ngIf="hasCoursesForDay(day)">
+            {{ getTotalHoursPerDay(day) | number:'1.1-1' }}h
+          </span>
+        </div>
+        
+        <div class="mobile-courses">
+          <div *ngIf="!hasCoursesForDay(day)" class="mobile-empty-day">
+            <span>🌟 Pas de cours</span>
+          </div>
+          
+          <div *ngFor="let course of weeklyTimetable[day]" 
+               class="mobile-course-card"
+               [class]="getCourseStatusClass(course)"
+               (click)="onCourseClick(course)">
+            
+            <div class="mobile-course-header">
+              <div class="mobile-course-time">
+                {{ course.startTime }} - {{ course.endTime }}
+              </div>
+              <div class="mobile-course-badges">
+                <span class="mobile-type-badge" [class]="getCourseTypeClass(course.courseType)">
+                  {{ course.courseType.toUpperCase() }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="mobile-course-body">
+              <h4>{{ course.courseName }}</h4>
+              <p class="mobile-teacher">👨‍🏫 {{ course.teacherName }}</p>
+              <p class="mobile-classroom">📍 {{ course.classroom }}</p>
+              
+              <div *ngIf="course.isCancelled || course.isModified" class="mobile-status">
+                <span *ngIf="course.isCancelled" class="mobile-status-cancelled">
+                  ❌ Cours annulé
+                </span>
+                <span *ngIf="course.isModified && !course.isCancelled" class="mobile-status-modified">
+                  🔄 Cours modifié
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="timetable-legend">
+      <h4>Légende</h4>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="legend-color course-type-cours"></span>
+          <span>Cours Magistral</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color course-type-td"></span>
+          <span>Travaux Dirigés</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color course-type-tp"></span>
+          <span>Travaux Pratiques</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-indicator cancelled"></span>
+          <span>Cours annulé</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-indicator modified"></span>
+          <span>Cours modifié</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Excuse Modal -->
+    <div class="modal-backdrop" *ngIf="showExcuseModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Générer un justificatif d'absence</h3>
+          <button class="close-btn" (click)="closeModal()">✖</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="field">
+            <label>Étudiant</label>
+            <input type="text" [(ngModel)]="studentName" placeholder="Nom Prénom" />
+          </div>
+
+          <div class="field">
+            <label>Date</label>
+            <input type="date" [(ngModel)]="absenceDate" />
+          </div>
+
+          <div class="field">
+            <label>Motif</label>
+            <input type="text" [(ngModel)]="motif" />
+          </div>
+
+          <div class="field">
+            <label>Cours</label>
+            <div class="course-preview" *ngIf="selectedCourse">
+              <strong>{{ selectedCourse.courseName }}</strong>
+              <div>{{ selectedCourse.startTime }} - {{ selectedCourse.endTime }}</div>
+              <div>{{ selectedCourse.teacherName }} — {{ selectedCourse.classroom }}</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Prévisualisation</label>
+            <textarea readonly rows="8">{{ generateExcuseText() }}</textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn" (click)="copyExcuseToClipboard()">Copier</button>
+          <button class="btn primary" (click)="downloadExcuseAsTxt()">Télécharger (.txt)</button>
+          <button class="btn outline" (click)="closeModal()">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

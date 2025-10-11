@@ -15,3 +15,61 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Modal styles (used by timetable component) - moved here to reduce component style size */
+.modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.6);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	padding: 1rem;
+}
+
+.modal {
+	width: min(800px, 100%);
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+	overflow: hidden;
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem 1.25rem;
+	border-bottom: 1px solid #e6edf3;
+}
+
+.modal-header h3 { margin: 0; }
+.close-btn {
+	border: none;
+	background: transparent;
+	font-size: 1.25rem;
+	cursor: pointer;
+}
+
+.modal-body { padding: 1rem 1.25rem; }
+.field { margin-bottom: 1rem; display: flex; flex-direction: column; }
+.field label { font-weight: 600; margin-bottom: 0.5rem; color: #334155; }
+.field input[type="text"], .field input[type="date"], .field textarea {
+	padding: 0.5rem 0.75rem;
+	border-radius: 8px;
+	border: 1px solid #e6edf3;
+	font-size: 0.95rem;
+}
+.field textarea { resize: vertical; font-family: inherit; }
+.course-preview { background: #f8fafc; padding: 0.5rem; border-radius: 8px; }
+
+.modal-footer { display:flex; gap:0.5rem; padding: 1rem 1.25rem; border-top:1px solid #e6edf3; justify-content:flex-end; }
+.btn { padding: 0.6rem 1rem; border-radius:8px; border: none; cursor: pointer; background:#eef2ff; }
+.btn.primary { background:#3b82f6; color:white; }
+.btn.outline { background: transparent; border:1px solid #cbd5e1; }
+
+@media (max-width: 480px) {
+	.modal { width: 100%; }
+	.modal-footer { flex-direction: column-reverse; gap: 0.5rem; }
+}

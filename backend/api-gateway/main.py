@@ -1,6 +1,9 @@
 # api-gateway/main.py
 import httpx
 
+# Configure logging for the gateway (shared config)
+import services.auth_service.app.logging_config as logging_config  # noqa: F401
+
 from services.auth_service.app.main import app
 
 

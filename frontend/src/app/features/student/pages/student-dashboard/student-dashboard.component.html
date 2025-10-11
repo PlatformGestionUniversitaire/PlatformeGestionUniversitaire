@@ -1,1 +1,502 @@
-<div class="student-dashboard">Student Dashboard</div>
+<div class="student-dashboard">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Tableau de Bord Étudiant</h1>
+      <p class="welcome-message" *ngIf="dashboardData?.profile">
+        Bonjour {{ dashboardData?.profile?.firstName }} {{ dashboardData?.profile?.lastName }} !
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Chargement de vos données...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
+    <button class="retry-btn" (click)="refreshDashboard()">Réessayer</button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error && dashboardData" class="dashboard-content">
+    
+    <!-- Quick Stats Cards -->
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">🎓</div>
+            <h3>Semestre Actuel</h3>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">S{{ dashboardData.profile.semester || 1 }}</div>
+            <div class="stat-label">{{ dashboardData.profile.year || 1 }}ème année</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">📚</div>
+            <h3>Programme</h3>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ dashboardData.profile.program || 'DSI' }}</div>
+            <div class="stat-label">spécialité</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">�</div>
+            <h3>Moyenne Générale</h3>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ (dashboardData.statistics.overallGPA || 15.5) | number:'1.2-2' }}</div>
+            <div class="stat-label">/ 20</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">✅</div>
+            <h3>Assiduité</h3>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ (100 - (dashboardData.statistics.absenteeismRate || 8)) | number:'1.0-0' }}%</div>
+            <div class="stat-label">de présence</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="content-grid">
+      
+      <!-- Profile Summary -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>Mon Profil</h2>
+          <div class="card-icon">👤</div>
+        </div>
+        <div class="card-content">
+          <div class="profile-info">
+            <div class="profile-detail">
+              <span class="label">Numéro Étudiant:</span>
+              <span class="value">{{ dashboardData.profile.studentId }}</span>
+            </div>
+            <div class="profile-detail">
+              <span class="label">Programme:</span>
+              <span class="value">{{ dashboardData.profile.program }}</span>
+            </div>
+            <div class="profile-detail">
+              <span class="label">Année/Semestre:</span>
+              <span class="value">{{ dashboardData.profile.year }}ème année - S{{ dashboardData.profile.semester }}</span>
+            </div>
+            <div class="profile-detail">
+              <span class="label">Email:</span>
+              <span class="value">{{ dashboardData.profile.email }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emploi du Temps Interactif -->
+      <div class="dashboard-card timetable-card">
+        <div class="card-header">
+          <h2>Mon Emploi du Temps</h2>
+          <div class="card-actions">
+            <button class="action-btn" (click)="openTimetableModal()">
+              <span class="icon">📅</span>
+              Voir Complet
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="timetable-preview">
+            <div class="day-selector">
+              <button 
+                *ngFor="let day of weekDays.slice(0, 3)" 
+                class="day-btn"
+                [class.active]="selectedDay === day"
+                (click)="selectedDay = day">
+                {{ day }}
+              </button>
+            </div>
+            
+            <div class="timetable-slots">
+              <div *ngIf="getTimetableForDay(selectedDay).length === 0" class="empty-state">
+                <span class="empty-icon">📅</span>
+                <p>Aucun cours ce jour</p>
+              </div>
+              
+              <div 
+                *ngFor="let slot of getTimetableForDay(selectedDay)" 
+                class="timetable-slot"
+                [class]="getSlotClass(slot)"
+                (click)="onTimetableSlotClick(slot)">
+                <div class="slot-time">{{ slot.startTime }} - {{ slot.endTime }}</div>
+                <div class="slot-course">{{ slot.courseName }}</div>
+                <div class="slot-teacher">{{ slot.teacherName }}</div>
+                <div class="slot-location">{{ slot.classroom }}</div>
+                <div class="slot-type">{{ slot.courseType | uppercase }}</div>
+                
+                <div *ngIf="slot.isCancelled" class="slot-status cancelled">ANNULÉ</div>
+                <div *ngIf="slot.isModified" class="slot-status modified">MODIFIÉ</div>
+              </div>
+            </div>
+            
+            <!-- Actions pour le créneau sélectionné -->
+            <div *ngIf="selectedTimetableSlot" class="slot-actions">
+              <h4>Actions pour: {{ selectedTimetableSlot.courseName }}</h4>
+              <div class="action-buttons">
+                <button class="action-btn excuse" (click)="openExcuseModal()">
+                  <span class="icon">📝</span>
+                  Demander Excuse
+                </button>
+                <button class="action-btn makeup" (click)="openMakeupModal()">
+                  <span class="icon">🔄</span>
+                  Demander Rattrapage
+                </button>
+                <button class="action-btn message-teacher" (click)="openMessageModal('teacher')">
+                  <span class="icon">👨‍🏫</span>
+                  Message Enseignant
+                </button>
+                <button class="action-btn message-director" (click)="openMessageModal('director')">
+                  <span class="icon">👔</span>
+                  Message Directeur
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Grades -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>Dernières Notes</h2>
+          <div class="card-icon">📊</div>
+        </div>
+        <div class="card-content">
+          <div *ngIf="dashboardData.recentGrades.length === 0" class="empty-state">
+            <span class="empty-icon">📊</span>
+            <p>Aucune note récente</p>
+          </div>
+          <div *ngFor="let grade of dashboardData.recentGrades" class="grade-item">
+            <div class="grade-info">
+              <h4>{{ grade.courseName }}</h4>
+              <p>{{ grade.examType | uppercase }} - {{ formatDate(grade.date) }}</p>
+            </div>
+            <div class="grade-score">
+              <span class="score">{{ grade.grade }}/{{ grade.maxGrade }}</span>
+              <span class="coefficient">Coef. {{ grade.coefficient }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Overview -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>Mes Statistiques</h2>
+          <div class="card-icon">📈</div>
+        </div>
+        <div class="card-content">
+          <div class="stats-overview">
+            <div class="stat-item">
+              <span class="stat-label">Moyenne Générale</span>
+              <span class="stat-value" [class]="getGPAColor(dashboardData.statistics.overallGPA)">
+                {{ dashboardData.statistics.overallGPA | number:'1.2-2' }}/20
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Absences Totales</span>
+              <span class="stat-value">{{ dashboardData.statistics.totalAbsences }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Taux d'Assiduité</span>
+              <span class="stat-value" [class]="getAttendanceColor(100 - dashboardData.statistics.absenteeismRate)">
+                {{ 100 - dashboardData.statistics.absenteeismRate | number:'1.1-1' }}%
+              </span>
+            </div>
+            <div class="stat-item" *ngIf="dashboardData.statistics.isAtRiskOfElimination">
+              <span class="stat-label">⚠️ Risque d'Élimination</span>
+              <span class="stat-value text-red-600">OUI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Notifications -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>Notifications Récentes</h2>
+          <div class="card-icon">🔔</div>
+        </div>
+        <div class="card-content">
+          <div *ngIf="dashboardData.unreadNotifications.length === 0" class="empty-state">
+            <span class="empty-icon">🔔</span>
+            <p>Aucune notification</p>
+          </div>
+          <div *ngFor="let notification of dashboardData.unreadNotifications.slice(0, 3)" 
+               class="notification-item"
+               [class]="getPriorityClass(notification.priority)"
+               (click)="onNotificationClick(notification)">
+            <div class="notification-icon">{{ getNotificationIcon(notification.type) }}</div>
+            <div class="notification-content">
+              <h4>{{ notification.title }}</h4>
+              <p>{{ notification.message }}</p>
+              <span class="notification-time">{{ formatDate(notification.createdAt) }}</span>
+            </div>
+            <div class="notification-badge" *ngIf="!notification.isRead"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Excuses -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>Demandes d'Excuse</h2>
+          <div class="card-icon">📝</div>
+        </div>
+        <div class="card-content">
+          <div *ngIf="dashboardData.pendingExcuses.length === 0" class="empty-state">
+            <span class="empty-icon">📝</span>
+            <p>Aucune demande en cours</p>
+          </div>
+          <div *ngFor="let excuse of dashboardData.pendingExcuses" class="excuse-item">
+            <div class="excuse-content">
+              <h4>Demande d'excuse</h4>
+              <p>{{ excuse.reason }}</p>
+              <span class="excuse-date">{{ formatDate(excuse.submittedAt) }}</span>
+            </div>
+            <div class="excuse-status">
+              <span class="status-badge" [class]="'status-' + excuse.status">
+                {{ excuse.status === 'pending' ? 'En attente' : excuse.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Emploi du Temps Complet -->
+  <div *ngIf="showTimetableModal" class="modal-overlay" (click)="closeTimetableModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Emploi du Temps Complet</h2>
+        <button class="close-btn" (click)="closeTimetableModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="week-navigation">
+          <button 
+            *ngFor="let day of weekDays" 
+            class="day-tab"
+            [class.active]="selectedDay === day"
+            (click)="selectedDay = day">
+            {{ day }}
+          </button>
+        </div>
+        
+        <div class="day-timetable">
+          <h3>{{ selectedDay }}</h3>
+          <div class="time-slots">
+            <div 
+              *ngFor="let slot of getTimetableForDay(selectedDay)" 
+              class="time-slot"
+              [class]="getSlotClass(slot)"
+              (click)="onTimetableSlotClick(slot)">
+              <div class="slot-header">
+                <span class="time-range">{{ slot.startTime }} - {{ slot.endTime }}</span>
+                <span class="course-type">{{ slot.courseType | uppercase }}</span>
+              </div>
+              <div class="slot-body">
+                <h4>{{ slot.courseName }}</h4>
+                <p>{{ slot.teacherName }}</p>
+                <p>{{ slot.classroom }}</p>
+              </div>
+              <div *ngIf="slot.isCancelled || slot.isModified" class="slot-badge">
+                <span *ngIf="slot.isCancelled" class="cancelled">ANNULÉ</span>
+                <span *ngIf="slot.isModified" class="modified">MODIFIÉ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Demande d'Excuse -->
+  <div *ngIf="showExcuseModal" class="modal-overlay" (click)="closeExcuseModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Demande d'Excuse d'Absence</h2>
+        <button class="close-btn" (click)="closeExcuseModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedTimetableSlot" class="course-info">
+          <h3>{{ selectedTimetableSlot.courseName }}</h3>
+          <p>{{ selectedTimetableSlot.teacherName }} - {{ selectedTimetableSlot.classroom }}</p>
+          <p>{{ selectedTimetableSlot.dayOfWeek }} {{ selectedTimetableSlot.startTime }}-{{ selectedTimetableSlot.endTime }}</p>
+        </div>
+        
+        <form (ngSubmit)="submitExcuse()" class="excuse-form">
+          <div class="form-group">
+            <label for="excuse-reason">Motif de l'absence *</label>
+            <textarea 
+              id="excuse-reason"
+              [(ngModel)]="excuseForm.reason" 
+              name="reason"
+              placeholder="Expliquez le motif de votre absence..."
+              required
+              rows="4"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="excuse-document">Document justificatif (optionnel)</label>
+            <input 
+              type="file" 
+              id="excuse-document"
+              (change)="onFileSelect($event)"
+              accept=".pdf,.jpg,.jpeg,.png">
+            <small>Formats acceptés: PDF, JPG, PNG (max 5MB)</small>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="closeExcuseModal()">Annuler</button>
+            <button type="submit" class="btn-primary" [disabled]="!excuseForm.reason.trim()">
+              Envoyer la Demande
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Demande de Rattrapage -->
+  <div *ngIf="showMakeupModal" class="modal-overlay" (click)="closeMakeupModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Demande de Séance de Rattrapage</h2>
+        <button class="close-btn" (click)="closeMakeupModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedTimetableSlot" class="course-info">
+          <h3>{{ selectedTimetableSlot.courseName }}</h3>
+          <p>{{ selectedTimetableSlot.teacherName }} - {{ selectedTimetableSlot.classroom }}</p>
+        </div>
+        
+        <form (ngSubmit)="submitMakeupRequest()" class="makeup-form">
+          <div class="form-group">
+            <label for="makeup-date">Date préférée</label>
+            <input 
+              type="date" 
+              id="makeup-date"
+              [(ngModel)]="makeupForm.preferredDate" 
+              name="preferredDate">
+          </div>
+          
+          <div class="form-group">
+            <label for="makeup-time">Heure préférée</label>
+            <select id="makeup-time" [(ngModel)]="makeupForm.preferredTime" name="preferredTime">
+              <option value="">Sélectionner une heure</option>
+              <option value="08:30">08:30</option>
+              <option value="10:00">10:00</option>
+              <option value="11:30">11:30</option>
+              <option value="14:00">14:00</option>
+              <option value="15:30">15:30</option>
+              <option value="17:00">17:00</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="makeup-reason">Motif de la demande *</label>
+            <textarea 
+              id="makeup-reason"
+              [(ngModel)]="makeupForm.reason" 
+              name="reason"
+              placeholder="Expliquez pourquoi vous avez besoin de cette séance de rattrapage..."
+              required
+              rows="4"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="closeMakeupModal()">Annuler</button>
+            <button type="submit" class="btn-primary" [disabled]="!makeupForm.reason.trim()">
+              Envoyer la Demande
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Envoi de Message -->
+  <div *ngIf="showMessageModal" class="modal-overlay" (click)="closeMessageModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Envoyer un Message</h2>
+        <button class="close-btn" (click)="closeMessageModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="recipient-info">
+          <p>Destinataire: 
+            <strong>
+              {{ messageForm.recipientType === 'teacher' ? 'Enseignant' : 'Directeur' }}
+              <span *ngIf="selectedTimetableSlot && messageForm.recipientType === 'teacher'">
+                - {{ selectedTimetableSlot.teacherName }}
+              </span>
+            </strong>
+          </p>
+        </div>
+        
+        <form (ngSubmit)="sendMessage()" class="message-form">
+          <div class="form-group">
+            <label for="message-subject">Objet *</label>
+            <input 
+              type="text" 
+              id="message-subject"
+              [(ngModel)]="messageForm.subject" 
+              name="subject"
+              placeholder="Objet du message..."
+              required>
+          </div>
+          
+          <div class="form-group">
+            <label for="message-content">Message *</label>
+            <textarea 
+              id="message-content"
+              [(ngModel)]="messageForm.content" 
+              name="content"
+              placeholder="Tapez votre message..."
+              required
+              rows="6"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="closeMessageModal()">Annuler</button>
+            <button type="submit" class="btn-primary" [disabled]="!messageForm.subject.trim() || !messageForm.content.trim()">
+              Envoyer le Message
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

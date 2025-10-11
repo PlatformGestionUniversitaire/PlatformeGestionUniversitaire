@@ -15,7 +15,17 @@ export const routes: Routes = [
 
 	// Feature areas (lazy-loaded standalone dashboards)
 	{ path: 'student', loadComponent: () => import('./features/student/pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent) },
-	{ path: 'teacher', loadComponent: () => import('./features/teacher/pages/teacher-dashboard/teacher-dashboard.component').then(m => m.TeacherDashboardComponent) },
+	{ 
+		path: 'teacher',
+		children: [
+			{ path: '', loadComponent: () => import('./features/teacher/pages/teacher-dashboard/teacher-dashboard.component').then(m => m.TeacherDashboardComponent) },
+			{ path: 'dashboard', loadComponent: () => import('./features/teacher/pages/teacher-dashboard/teacher-dashboard.component').then(m => m.TeacherDashboardComponent) },
+			{ path: 'timetable', loadComponent: () => import('./features/teacher/components/timetable/timetable.component').then(m => m.TimetableComponent) },
+			{ path: 'absences', loadComponent: () => import('./features/teacher/components/absences/absences.component').then(m => m.AbsencesComponent) },
+			{ path: 'makeup', loadComponent: () => import('./features/teacher/components/makeup/makeup.component').then(m => m.MakeupComponent) },
+			{ path: 'messages', loadComponent: () => import('./features/teacher/components/messages/messages.component').then(m => m.MessagesComponent) }
+		]
+	},
 	{ 
 		path: 'director',
 		children: [
