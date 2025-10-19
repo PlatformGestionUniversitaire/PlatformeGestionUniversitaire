@@ -13,8 +13,19 @@ export const routes: Routes = [
 		]
 	},
 
-	// Feature areas (lazy-loaded standalone dashboards)
-	{ path: 'student', loadComponent: () => import('./features/student/pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent) },
+	// Feature areas (lazy-loaded modules or standalone dashboards)
+	{
+		path: 'student',
+		children: [
+			{ path: '', loadComponent: () => import('./features/student/pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent) },
+			{ path: 'dashboard', loadComponent: () => import('./features/student/pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent) },
+			{ path: 'timetable', loadComponent: () => import('./features/student/components/timetable/timetable.component').then(m => m.TimetableComponent) },
+			{ path: 'absences', loadComponent: () => import('./features/student/components/absences/absences.component').then(m => m.AbsencesComponent) },
+			{ path: 'messages', loadComponent: () => import('./features/student/components/messages/messages.component').then(m => m.MessagesComponent) },
+			{ path: 'grades', loadComponent: () => import('./features/student/components/grades/grades.component').then(m => m.GradesComponent) },
+			{ path: 'notifications', loadComponent: () => import('./features/student/components/notifications/notifications.component').then(m => m.NotificationsComponent) }
+		]
+	},
 	{ 
 		path: 'teacher',
 		children: [
@@ -39,7 +50,19 @@ export const routes: Routes = [
 			{ path: 'conflicts', loadComponent: () => import('./features/director/pages/conflicts-page/conflicts-page.component').then(m => m.ConflictsPageComponent) }
 		]
 	},
-	{ path: 'admin', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+	{ 
+		path: 'admin',
+		children: [
+			{ path: '', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+			{ path: 'dashboard', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+			{ path: 'referentials', loadComponent: () => import('./features/admin/components/global-referentials/global-referentials.component').then(m => m.GlobalReferentialsComponent) },
+			{ path: 'events', loadComponent: () => import('./features/admin/components/events-management/events-management.component').then(m => m.EventsManagementComponent) },
+			{ path: 'reports', loadComponent: () => import('./features/admin/components/reports/reports.component').then(m => m.ReportsComponent) },
+			{ path: 'timetables', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+			{ path: 'conflicts', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+			{ path: 'settings', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) }
+		]
+	},
 
 	{ path: '**', loadComponent: () => import('./components/not-found/not-found.component').then(m => m.NotFoundComponent) }
 ];

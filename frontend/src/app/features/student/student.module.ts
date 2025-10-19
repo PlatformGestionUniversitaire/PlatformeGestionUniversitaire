@@ -1,28 +1,10 @@
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
-import { StudentRoutingModule } from './student-routing.module';
-import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard.component';
-import { TimetableComponent } from './components/timetable/timetable.component';
-
-// Services
-import { StudentService } from './services/student.service';
-import { MessagingService } from './services/messaging.service';
+import { studentRoutes } from './student-routing.module';
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    StudentRoutingModule,
-    StudentDashboardComponent,
-    TimetableComponent
-  ],
-  providers: [
-    StudentService,
-    MessagingService
-  ]
+  imports: [CommonModule, RouterModule.forChild(studentRoutes)],
+  declarations: []
 })
-export class StudentModule { }
+export class StudentModule {}

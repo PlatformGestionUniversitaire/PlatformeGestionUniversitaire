@@ -1,0 +1,18 @@
+<div class="admin-page">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Événements institutionnels</h2>
+      <div class="actions"><button class="btn-primary" (click)="add()">Nouvel événement</button></div>
+    </div>
+    <div class="panel-body">
+      <ul class="events-list">
+        <li *ngFor="let e of events">
+          <div class="title">{{e.title}}</div>
+          <div class="meta">{{e.date | date:'medium'}}</div>
+          <div class="actions"><button class="btn-danger" (click)="remove(e)">Supprimer</button></div>
+        </li>
+        <li *ngIf="events?.length === 0" class="empty">Aucun événement</li>
+      </ul>
+    </div>
+  </div>
+</div>

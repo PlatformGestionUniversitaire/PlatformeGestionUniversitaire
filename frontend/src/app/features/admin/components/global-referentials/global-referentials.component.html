@@ -1,0 +1,39 @@
+<div class="admin-page">
+  <div class="admin-sidebar">
+    <ul>
+      <li *ngFor="let s of sections" (click)="setSection(s)" [class.active]="s===activeSection">{{s.title}}</li>
+    </ul>
+  </div>
+
+  <div class="admin-content">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>{{activeSection.title}}</h2>
+        <div class="actions">
+          <button class="btn-primary" (click)="add()">Ajouter</button>
+          <button (click)="loadAll()">Rafraîchir</button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <table class="referentials-table">
+          <thead>
+            <tr><th>#</th><th>Nom</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of activeSection.items; let i = index">
+              <td>{{i + 1}}</td>
+              <td>{{item.name || item.title || item.email || item.label}}</td>
+              <td>
+                <button class="btn-danger" (click)="remove(item)">Supprimer</button>
+              </td>
+            </tr>
+            <tr *ngIf="activeSection.items?.length === 0">
+              <td colspan="3" class="empty">Aucun élément</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

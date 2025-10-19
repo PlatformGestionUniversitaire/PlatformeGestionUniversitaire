@@ -1,0 +1,147 @@
+<div class="admin-dashboard">
+  <!-- Floating Shapes Background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Tableau de bord Administrateur</h1>
+      <p class="subtitle">
+        Gérez les référentiels, emplois du temps, événements et rapports institutionnels
+      </p>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content">
+
+    <!-- Statistics Overview -->
+    <section class="stats-section">
+      <h2>Statistiques rapides</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>apartment</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.departments }}</div>
+            <div class="stat-label">Départements</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.teachers }}</div>
+            <div class="stat-label">Enseignants</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>school</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.students }}</div>
+            <div class="stat-label">Étudiants</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>meeting_room</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.rooms }}</div>
+            <div class="stat-label">Salles</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <h2>Actions Rapides</h2>
+      <div class="actions-grid">
+        <mat-card class="action-card" (click)="navigateTo('referentials')">
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>folder_shared</mat-icon>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3>Référentiels Globaux</h3>
+            <p>Départements, spécialités, enseignants, étudiants, salles, matières</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" (click)="navigateTo('timetables')">
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>schedule</mat-icon>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3>Emplois du Temps</h3>
+            <p>Superviser tous les emplois du temps de l'institution</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" (click)="navigateTo('conflicts')">
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>report_problem</mat-icon>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3>Gestion des Conflits</h3>
+            <p>Résoudre les conflits d'horaires</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" (click)="navigateTo('events')">
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>event</mat-icon>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3>Événements</h3>
+            <p>Fermetures, conférences et événements institutionnels</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" (click)="navigateTo('reports')">
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>analytics</mat-icon>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3>Rapports</h3>
+            <p>Générer des rapports institutionnels (PDF, CSV)</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" (click)="navigateTo('settings')">
+          <div class="action-header">
+            <div class="action-icon">
+              <mat-icon>settings</mat-icon>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3>Paramètres</h3>
+            <p>Configuration système et préférences</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </section>
+
+  </div>
+</div>

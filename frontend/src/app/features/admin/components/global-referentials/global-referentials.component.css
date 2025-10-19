@@ -1,0 +1,28 @@
+.admin-page{ display:flex; gap:20px; align-items:flex-start }
+.admin-sidebar{ width:240px; background: rgba(255,255,255,0.98); border-radius:12px; padding:16px; box-shadow:0 10px 30px rgba(2,6,23,0.06) }
+.admin-sidebar ul{ list-style:none; padding:0; margin:0 }
+.admin-sidebar li{ padding:10px 12px; cursor:pointer; border-radius:8px; color:var(--brand-dark-blue); font-weight:600; transition:all .18s ease }
+.admin-sidebar li:hover{ background:rgba(2,6,23,0.03) }
+.admin-sidebar li.active{ background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color:#fff }
+
+.admin-content{ flex:1 }
+.panel{ background: rgba(255,255,255,0.98); border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.06); overflow:hidden }
+.panel-header{ display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid rgba(2,6,23,0.04) }
+.panel-title{ margin:0; font-size:1.05rem; font-weight:700; color:var(--brand-dark-blue) }
+.panel-body{ padding:16px }
+.actions{ display:flex; gap:8px; align-items:center }
+.actions button{ margin-left:0 }
+.btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600 }
+.btn-primary{ background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color:#fff; box-shadow:0 8px 20px rgba(18,52,86,0.08) }
+.btn-outline{ background:transparent; border:1px solid rgba(2,6,23,0.06); color:var(--brand-dark-blue) }
+.btn-danger{ background:#dc3545; color:#fff }
+
+.referentials-table{ width:100%; border-collapse:collapse }
+.referentials-table th,.referentials-table td{ text-align:left; padding:12px; border-bottom:1px solid rgba(2,6,23,0.04) }
+.referentials-table th{ font-weight:700; color:#374151 }
+.empty{ text-align:center; color:#6c757d; padding:20px }
+
+@media (max-width:700px){
+	.admin-page{ flex-direction:column }
+	.admin-sidebar{ width:100% }
+}

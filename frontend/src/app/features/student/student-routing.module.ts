@@ -1,45 +1,32 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard.component';
-import { TimetableComponent } from './components/timetable/timetable.component';
+import { Routes } from '@angular/router';
 
-const routes: Routes = [
+export const studentRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full'
+    loadComponent: () => import('./pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent)
   },
   {
     path: 'dashboard',
-    component: StudentDashboardComponent,
-    title: 'Tableau de Bord Étudiant'
+    loadComponent: () => import('./pages/student-dashboard/student-dashboard.component').then(m => m.StudentDashboardComponent)
   },
   {
     path: 'timetable',
-    component: TimetableComponent,
-    title: 'Emploi du Temps'
-  },
-  {
-    path: 'grades',
-    loadComponent: () => import('./components/grades/grades.component').then(c => c.GradesComponent),
-    title: 'Mes Notes'
+    loadComponent: () => import('./components/timetable/timetable.component').then(m => m.TimetableComponent)
   },
   {
     path: 'absences',
-    loadComponent: () => import('./components/absences/absences.component').then(c => c.AbsencesComponent),
-    title: 'Mes Absences'
+    loadComponent: () => import('./components/absences/absences.component').then(m => m.AbsencesComponent)
   },
   {
     path: 'messages',
-    loadComponent: () => import('./components/messages/messages.component').then(c => c.MessagesComponent),
-    title: 'Messagerie'
+    loadComponent: () => import('./components/messages/messages.component').then(m => m.MessagesComponent)
+  },
+  {
+    path: 'grades',
+    loadComponent: () => import('./components/grades/grades.component').then(m => m.GradesComponent)
+  },
+  {
+    path: 'notifications',
+    loadComponent: () => import('./components/notifications/notifications.component').then(m => m.NotificationsComponent)
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class StudentRoutingModule { }
-
-export const studentRoutes = routes;

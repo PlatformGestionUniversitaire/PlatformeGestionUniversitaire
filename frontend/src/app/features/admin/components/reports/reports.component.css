@@ -1,0 +1,15 @@
+.panel{ background: rgba(255,255,255,0.98); border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.06); overflow:hidden }
+.panel-header{ display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom:1px solid rgba(2,6,23,0.04) }
+.panel-title{ margin:0; font-size:1.05rem; font-weight:700; color:var(--brand-dark-blue) }
+.panel-body{ padding:16px }
+.controls{ display:flex; gap:8px; align-items:center }
+.btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600 }
+.btn-primary{ background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color:#fff; box-shadow:0 8px 20px rgba(18,52,86,0.08) }
+.btn-outline{ background:transparent; border:1px solid rgba(2,6,23,0.06); color:var(--brand-dark-blue) }
+
+.reports-grid{ display:grid; grid-template-columns: 1fr 360px; gap:16px }
+.chart-card{ min-height:240px }
+
+@media (max-width:900px){
+	.reports-grid{ grid-template-columns: 1fr }
+}

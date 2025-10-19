@@ -1,0 +1,9 @@
+<div class="notifications">
+  <h3>Notifications</h3>
+  <div *ngFor="let n of notifications" class="note" [class.unread]="!n.read">
+    <div class="title">{{n.title}}</div>
+    <div class="body">{{n.body}}</div>
+    <div class="meta">{{n.date | date:'short'}}</div>
+    <button mat-button (click)="markRead(n)">Marquer lu</button>
+  </div>
+</div>

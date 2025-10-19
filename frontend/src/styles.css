@@ -73,3 +73,180 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 	.modal { width: 100%; }
 	.modal-footer { flex-direction: column-reverse; gap: 0.5rem; }
 }
+
+/* ---------------------------------------------------------------------------
+	 Teacher global styles (moved from feature teacher component CSS files)
+	 These styles were consolidated from:
+	 - src/app/features/teacher/components/absences/absences.component.css
+	 - src/app/features/teacher/components/makeup/makeup.component.css
+	 - src/app/features/teacher/components/messages/messages.component.css
+	 - src/app/features/teacher/components/timetable/timetable.component.css
+	 - src/app/features/teacher/pages/teacher-dashboard/teacher-dashboard.component.css
+
+	 Keeping them global ensures every feature uses the teacher look & feel.
+	 If you want some pages to diverge later, move targeted rules back to
+	 component-scoped styles or add feature-specific class prefixes.
+--------------------------------------------------------------------------- */
+
+/* Generic page container used by teacher pages */
+.page-background,
+.timetable-container,
+.absences-container,
+.makeup-container,
+.messages-container,
+.teacher-dashboard {
+	position: relative;
+	min-height: 100vh;
+	background: linear-gradient(135deg, var(--brand-dark-blue) 0%, var(--brand-light-blue) 100%);
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+	overflow-x: hidden;
+	padding: 2rem 1.5rem;
+}
+
+/* Floating Shapes Background (shared) */
+.floating-shapes {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.shape {
+	position: absolute;
+	background: rgba(255,255,255,0.06);
+	backdrop-filter: blur(10px);
+	border-radius: 50%;
+}
+
+.shape-1 { width: 300px; height: 300px; top: 10%; left: -140px; animation: float 20s infinite ease-in-out; }
+.shape-2 { width: 200px; height: 200px; top: 50%; right: -90px; animation: float 15s infinite ease-in-out reverse; }
+.shape-3 { width: 150px; height: 150px; bottom: 20%; left: 10%; animation: float 18s infinite ease-in-out; }
+
+/* Shared header styles */
+.header-content h1 {
+	font-size: 2.5rem;
+	margin: 0 0 0.5rem 0;
+	font-weight: 800;
+	text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.subtitle { font-size: 1.1rem; opacity: 0.9; margin: 0; }
+
+/* Shared glass cards */
+.card-glass {
+	background: rgba(255,255,255,0.95);
+	border-radius: 12px;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+	overflow: hidden;
+}
+
+/* Common grids and lists */
+.summary-grid, .absence-cards, .makeup-cards, .request-cards { display: grid; gap: 1.5rem; }
+
+.file-upload { display:flex; align-items:center; gap:1rem; padding:1rem; border:2px dashed #ccc; border-radius:8px; background:#f8f9fa; cursor:pointer; transition:all .3s ease; }
+.file-upload:hover { border-color:var(--brand-light-blue); background:#e3f2fd; }
+.file-upload input[type="file"] { position:absolute; opacity:0; width:0; height:0; }
+
+.no-data, .no-makeups, .no-messages { text-align:center; padding:3rem 1rem; color:#666; }
+
+/* Timetable-specific pieces (kept names to avoid breaking templates) */
+.timetable-grid { display: grid; grid-template-columns: 120px repeat(5, 1fr); gap:1px; background:#e0e0e0; }
+.header-cell { background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color: white; padding:1rem; text-align:center; font-weight:600; }
+.time-slot { background:#f8f9fa; padding:1rem; display:flex; align-items:center; justify-content:center; font-weight:600; color:var(--brand-dark-blue); border-right:2px solid #e0e0e0; }
+.course-card { height:100%; padding:0.75rem; border-radius:8px; cursor:pointer; position:relative; transition:all .3s ease; display:flex; flex-direction:column; justify-content:space-between; }
+.course-card:hover { transform:scale(1.02); box-shadow:0 4px 15px rgba(0,0,0,0.2); }
+.course-lecture { background: linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%); border-left:4px solid var(--brand-light-blue); }
+.course-td { background: linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 100%); border-left:4px solid #4caf50; }
+.course-tp { background: linear-gradient(135deg,#fff3e0 0%,#ffcc80 100%); border-left:4px solid #ff9800; }
+
+/* Teacher dashboard small helpers */
+.stat-card { background: rgba(255,255,255,0.95); border-radius:12px; padding:1.5rem; display:flex; align-items:center; gap:1rem; box-shadow:0 8px 25px rgba(0,0,0,0.15); backdrop-filter: blur(10px); transition:all .3s ease; cursor:pointer; }
+.stat-card:hover { transform:translateY(-2px); box-shadow:0 12px 35px rgba(0,0,0,0.2); }
+
+/* Message list helpers */
+.messages-layout { display:grid; grid-template-columns:300px 1fr; gap:1.5rem; min-height:70vh; }
+.menu-item { display:flex; align-items:center; gap:1rem; padding:1rem; border-radius:8px; cursor:pointer; transition:all .3s ease; color:#666; }
+.menu-item:hover { background:#f5f5f5; color:var(--brand-dark-blue); }
+.menu-item.active { background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color:white; }
+.message-avatar, .absence-avatar, .makeup-avatar, .student-avatar { background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color:white; display:flex; align-items:center; justify-content:center; }
+
+/* Shared small utilities */
+.full-width { width:100%; }
+.half-width { flex:1; }
+.form-actions { display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem; padding-top:1rem; border-top:1px solid #eee; }
+
+/* Animations reused by many teacher pages */
+@keyframes float { 0%,100%{ transform:translate(0,0) rotate(0deg);} 33%{ transform:translate(30px,-30px) rotate(120deg);} 66%{ transform:translate(-20px,20px) rotate(240deg);} }
+
+/* Responsive adjustments kept from components */
+@media (max-width: 1200px) { .timetable-grid { grid-template-columns: 100px repeat(5,1fr); } }
+@media (max-width: 968px) { .messages-layout { grid-template-columns:250px 1fr; } }
+@media (max-width: 768px) {
+	.page-background, .timetable-container, .absences-container, .makeup-container, .messages-container { padding: 1rem; }
+	.header-content h1 { font-size: 2rem; }
+}
+@media (max-width: 480px) {
+	.header-content h1 { font-size: 1.6rem; }
+	.timetable-grid { grid-template-columns: 60px repeat(2,1fr); gap:0.5px; }
+}
+
+/* Material Angular Overrides (kept globally) */
+::ng-deep .mat-mdc-card { --mdc-elevated-card-container-elevation: none !important; }
+::ng-deep .mat-mdc-form-field { width:100%; }
+::ng-deep .mat-mdc-button .mat-icon { margin-right:0.5rem; }
+
+/* ---------------------------------------------------------------------------
+	 Compatibility: map student timetable classes to teacher global timetable
+	 This ensures the student timetable visuals match the teacher timetable
+	 without changing many component files. Add small helpers / aliases.
+--------------------------------------------------------------------------- */
+
+/* Day tabs used in student modal -> reuse teacher day header styling */
+.day-tab,
+.day-btn {
+	padding: 0.75rem 1rem;
+	border-radius: 8px;
+	background: transparent;
+	color: white;
+	border: none;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+.day-tab.active,
+.day-btn.active {
+	background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue));
+	color: white;
+}
+
+/* Student slot -> reuse course-card look */
+.timetable-slot,
+.time-slot,
+.slot-body,
+.slot-header {
+	background: rgba(255,255,255,0.95);
+	border-radius: 12px;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+	padding: 0.75rem 1rem;
+	border-left: 4px solid transparent;
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+.timetable-slot:hover,
+.time-slot:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+
+/* Course types color variants similar to teacher timetable */
+.timetable-slot.course-lecture { background: linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%); border-left-color: var(--brand-light-blue); }
+.timetable-slot.course-td { background: linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 100%); border-left-color: #4caf50; }
+.timetable-slot.course-tp { background: linear-gradient(135deg,#fff3e0 0%,#ffcc80 100%); border-left-color: #ff9800; }
+
+/* Minor helpers */
+.slot-time { font-weight: 600; color: var(--brand-dark-blue); margin-bottom: 0.5rem; }
+.slot-course { font-weight: 700; color: var(--brand-dark-blue); margin-bottom: 0.25rem; }
+.slot-location, .slot-teacher, .slot-type { color: #666; font-size: 0.9rem; }
+
+/* Badges */
+.slot-badge .cancelled { background: #f44336; color: white; padding: 0.2rem .5rem; border-radius: 6px; font-weight:700; }
+.slot-badge .modified { background: #f4c842; color: #1a1a1a; padding: 0.2rem .5rem; border-radius: 6px; font-weight:700; }

@@ -1,4 +1,4 @@
-.teacher-dashboard {
+.admin-dashboard {
   position: relative;
   min-height: 100vh;
   background: linear-gradient(135deg, var(--brand-dark-blue) 0%, var(--brand-light-blue) 100%);
@@ -213,19 +213,6 @@
   border-radius: 50%;
   color: white;
   font-size: 28px;
-}
-
-/* Ensure mat-icon and svg icons inside icon containers are white */
-.stat-icon mat-icon,
-.action-icon mat-icon,
-.message-avatar mat-icon,
-.messages-card mat-icon,
-.schedule-card mat-icon,
-.action-icon svg,
-.stat-icon svg,
-.message-avatar svg {
-  color: white !important;
-  fill: white !important;
 }
 
 .action-badge {
