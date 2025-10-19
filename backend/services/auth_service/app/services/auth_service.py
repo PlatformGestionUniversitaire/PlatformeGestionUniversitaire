@@ -65,6 +65,9 @@ class AuthService:
         """Crée un nouvel utilisateur"""
         hashed_password = self.get_password_hash(user_data.password)
 
+        role = getattr(user_data, "role", "etudiant").lower()
+        is_superuser = role == "admin"
+
         db_user = User(
             email=user_data.email,
             username=user_data.username,
@@ -72,7 +75,7 @@ class AuthService:
             full_name=user_data.full_name,
             role=getattr(user_data, "role", "etudiant"),
             is_active=True,
-            is_superuser=False
+            is_superuser=is_superuser
         )
 
         self.db.add(db_user)
@@ -86,6 +89,8 @@ class AuthService:
                 db_user.id,
                 db_user.email,
                 db_user.username,
+                db_user.role,
+                db_user.is_superuser,
             )
         except Exception:
             # Fallback to print if logging configuration isn't set
