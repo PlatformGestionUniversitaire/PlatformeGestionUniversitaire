@@ -1,0 +1,18 @@
+.contact-wrapper { background: linear-gradient(-60deg, #3aa0ff 0%, #0b5a85 100%); border-radius: 12px; padding: 36px; color: #fff; }
+.contact-inner { display:flex; gap:40px; align-items:flex-start; max-width:1100px; margin:0 auto }
+.contact-info { flex:1 }
+.title { font-family: Outfit, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; font-size:1.6rem; font-weight:600 }
+.description { color: rgba(255,255,255,0.9); max-width:320px; margin-top:8px }
+.contact-icons { margin-top:18px; display:flex; gap:10px }
+.social { color: #fff; text-decoration:none }
+.form { background:#fff; padding:20px; border-radius:10px; flex:1; color:#111 }
+.label { display:block; margin-top:8px; margin-bottom:6px; color:#333; font-weight:600 }
+.input { width:100%; padding:10px; border-radius:8px; border:1px solid #e6e6e6; }
+.actions { display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:12px }
+.btn { background:#0b5a85; color:#fff; border:none; padding:10px 14px; border-radius:8px; cursor:pointer }
+.sent { color:green; font-weight:600 }
+
+@media (max-width: 780px) {
+  .contact-inner { flex-direction:column }
+  .contact-wrapper { padding:20px }
+}

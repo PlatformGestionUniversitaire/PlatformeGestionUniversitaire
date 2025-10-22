@@ -50,13 +50,13 @@
   animation: float 18s infinite ease-in-out;
 }
 
-/* Header */
+/* Header (matches student dashboard) */
 .absences-header {
   position: relative;
   z-index: 10;
+  padding: 2rem 1.5rem 1rem;
   text-align: center;
   color: var(--brand-white);
-  margin-bottom: 2rem;
 }
 
 .header-content h1 {
@@ -184,17 +184,18 @@
 
 .absence-card,
 .validation-card {
-  background: white;
+  background: rgba(255,255,255,0.95);
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   transition: all 0.3s ease;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .absence-card:hover,
 .validation-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.2);
 }
 
 .absence-avatar,
@@ -314,6 +315,18 @@
   .validation-section h3 {
     font-size: 1.3rem;
   }
+}
+
+/* Force icons (mat-icon / svg) inside icon containers to white — consistent with student styles */
+.action-icon mat-icon,
+.action-icon svg,
+.stat-icon,
+.stat-icon mat-icon,
+.message-avatar mat-icon,
+.icon-avatar mat-icon,
+.icon-avatar svg {
+  color: white !important;
+  fill: white !important;
 }
 
 /* Material Angular Overrides */

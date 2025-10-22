@@ -1,0 +1,30 @@
+<div class="contact-wrapper">
+  <div class="contact-inner">
+    <div class="contact-info">
+      <h2 class="title">Contactez-nous</h2>
+      <p class="description">Laissez votre email et nous vous répondrons sous 24 heures.</p>
+
+      <div class="contact-icons">
+        <a class="social">Twitter</a>
+        <a class="social">YouTube</a>
+        <a class="social">Instagram</a>
+      </div>
+    </div>
+
+    <div class="form">
+      <label class="label">Email</label>
+      <input class="input" type="email" [(ngModel)]="email" placeholder="votre@email.com" />
+
+      <label class="label">Nom</label>
+      <input class="input" type="text" [(ngModel)]="name" placeholder="John Doe" />
+
+      <label class="label">Votre message</label>
+      <textarea class="input" rows="4" [(ngModel)]="message" placeholder="Votre message..."></textarea>
+
+      <div class="actions">
+        <button class="btn" (click)="send()">Envoyer</button>
+        <span *ngIf="sent" class="sent">Message envoyé</span>
+      </div>
+    </div>
+  </div>
+</div>

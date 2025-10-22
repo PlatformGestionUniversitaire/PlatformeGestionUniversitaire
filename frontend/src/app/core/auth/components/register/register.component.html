@@ -21,26 +21,26 @@
         {{ errorMessage }}
       </div>
 
-      <!-- Username Field -->
+      <!-- Full Name Field -->
       <div class="form-group">
-        <label for="username" class="form-label">Username</label>
+        <label for="name" class="form-label">Full Name</label>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           <input
             type="text"
-            id="username"
-            formControlName="username"
+            id="name"
+            formControlName="name"
             class="form-input"
-            placeholder="Choose a username"
-            [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+            placeholder="Enter your full name"
+            [class.error]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
           />
         </div>
-        <div class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
-          <span *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</span>
-          <span *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
-          <span *ngIf="registerForm.get('username')?.errors?.['maxlength']">Username must not exceed 20 characters</span>
+        <div class="error-message" *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+          <span *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</span>
+          <span *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+          <span *ngIf="registerForm.get('name')?.errors?.['maxlength']">Name must not exceed 50 characters</span>
         </div>
       </div>
 

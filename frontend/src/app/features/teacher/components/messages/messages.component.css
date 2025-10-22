@@ -54,9 +54,9 @@
 .messages-header {
   position: relative;
   z-index: 10;
+  padding: 2rem 1.5rem 1rem;
   text-align: center;
   color: var(--brand-white);
-  margin-bottom: 2rem;
 }
 
 .header-content h1 {
@@ -665,6 +665,17 @@
   }
 }
 
+.action-icon mat-icon,
+.action-icon svg,
+.stat-icon,
+.stat-icon mat-icon,
+.message-avatar mat-icon,
+.icon-avatar mat-icon,
+.icon-avatar svg {
+  color: white !important;
+  fill: white !important;
+}
+
 /* Material Angular Overrides */
 ::ng-deep .mat-mdc-card {
   --mdc-elevated-card-container-elevation: none !important;
@@ -691,7 +702,7 @@
   font-weight: 600;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling (keep) */
 .message-items::-webkit-scrollbar {
   width: 6px;
 }

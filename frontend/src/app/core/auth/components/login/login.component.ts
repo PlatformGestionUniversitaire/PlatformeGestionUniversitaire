@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { LoginRequest } from '../../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -19,12 +21,13 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
@@ -38,15 +41,21 @@ export class LoginComponent implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      // Simulate API call
-      setTimeout(() => {
-        // Replace this with your actual authentication service
-        console.log('Login data:', this.loginForm.value);
-        
-        // Success - navigate to dashboard or home
-        this.router.navigate(['/dashboard']);
-        this.isLoading = false;
-      }, 1500);
+      const credentials: LoginRequest = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password
+      };
+
+      this.authService.login(credentials).subscribe({
+        next: (response) => {
+          // La redirection est gérée automatiquement par le service selon le rôle
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.message || 'Invalid email or password';
+          this.isLoading = false;
+        }
+      });
     } else {
       this.markFormGroupTouched(this.loginForm);
     }

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { RegisterRequest } from '../../../models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -18,14 +20,21 @@ export class RegisterComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
+  // OPTION: Pour désactiver complètement l'inscription publique,
+  // vous pouvez masquer cette route ou rediriger vers login
+  
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // OPTION: Pour désactiver l'inscription, décommentez la ligne suivante
+    // this.router.navigate(['/auth/login']);
+    
     this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), this.passwordStrengthValidator]],
       confirmPassword: ['', [Validators.required]]
@@ -75,15 +84,27 @@ export class RegisterComponent implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      // Simulate API call
-      setTimeout(() => {
-        // Replace this with your actual registration service
-        console.log('Register data:', this.registerForm.value);
-        
-        // Success - navigate to login or dashboard
-        this.router.navigate(['/auth/login']);
-        this.isLoading = false;
-      }, 1500);
+      const registerData: RegisterRequest = {
+        name: this.registerForm.value.name,
+        email: this.registerForm.value.email,
+        password: this.registerForm.value.password
+        // Note: Le rôle sera automatiquement 'student' pour l'auto-inscription
+        // Les autres rôles (teacher, admin, director) sont créés uniquement par l'admin
+      };
+
+      this.authService.register(registerData).subscribe({
+        next: (response) => {
+          // Succès - rediriger vers login
+          this.router.navigate(['/auth/login'], {
+            queryParams: { registered: 'true' }
+          });
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+          this.isLoading = false;
+        }
+      });
     } else {
       this.markFormGroupTouched(this.registerForm);
     }

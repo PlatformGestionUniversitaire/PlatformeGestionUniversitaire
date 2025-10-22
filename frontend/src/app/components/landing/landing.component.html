@@ -1,4 +1,6 @@
-<section class="landing-hero">
+<!-- Landing (clean, responsive) -->
+<div class="landing-container">
+  <!-- Floating Shapes Background (from not-found) -->
   <div class="floating-shapes" aria-hidden="true">
     <div class="shape shape-1"></div>
     <div class="shape shape-2"></div>
@@ -6,52 +8,238 @@
     <div class="shape shape-4"></div>
   </div>
 
-  <!-- Top-left ISET Tozeur logo (add image at /assets/images/logo-iset-tozeur.png) -->
-  <div class="top-left-logo" aria-hidden="false">
-    <img src="/assets/images/logo-iset-tozeur.svg" alt="ISET Tozeur" onerror="this.onerror=null;this.src='/assets/images/logo-university.svg'" />
-  </div>
+  <!-- 1️⃣ NOUVELLE BARRE DE NAVIGATION FIXE -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-logo">
+        <img src="/assets/images/logo-iset-tozeur.png" alt="ISET Tozeur" />
+        <span>ISET Tozeur</span>
+      </div>
+      <div class="navbar-links">
+        <a href="#accueil" class="nav-link">Accueil</a>
+        <a href="#fonctionnalites" class="nav-link">Fonctionnalités</a>
+        <a href="#evenements" class="nav-link">Événements</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </div>
+      <div class="navbar-actions">
+        <button class="btn-login" (click)="getStarted()">Connexion / S'inscrire</button>
+      </div>
+    </div>
+  </nav>
 
+<section class="landing-hero" id="accueil">
   <div class="hero-inner">
-    <div class="content">
+    <div class="hero-left">
       <div class="hero-copy">
-        <h1>{{ title }}</h1>
-        <p class="subtitle">Une plateforme moderne pour gérer la vie universitaire — étudiants, enseignants et administration.</p>
+        <h1>{{ title }} <span class="highlight">ISET Tozeur</span></h1>
+        <p class="subtitle">Plateforme moderne pour la gestion universitaire — étudiants, enseignants et administration.</p>
+
         <div class="cta-row">
-          <button class="btn btn-primary" mat-raised-button color="primary" (click)="getStarted()">Commencer</button>
-          
+          <button class="btn btn-primary" (click)="getStarted()">Commencer</button>
+          <button class="btn btn-secondary" (click)="getStarted()">Découvrir</button>
+        </div>
+
+        <div class="iset-metrics">
+          <div class="metric">
+            <div class="metric-value">{{ usersDisplay }}</div>
+            <div class="metric-label">Utilisateurs</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">{{ teachers }}+</div>
+            <div class="metric-label">Enseignants</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">{{ students }}+</div>
+            <div class="metric-label">Étudiants</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="hero-card mat-card-like">
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-shape stat-shape-blue" aria-hidden="true"></div>
-          <div class="stat-value">{{ usersDisplay }}</div>
-          <div class="stat-label">Utilisateurs</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-shape stat-shape-yellow" aria-hidden="true"></div>
-          <div class="stat-value">24/7</div>
-          <div class="stat-label">Support</div>
-        </div>
-      </div>
-     
+    <div class="hero-right">
+      <img src="/assets/images/campus-hero.jpg" alt="Campus image" class="hero-image"/>
     </div>
   </div>
-</section>
 
-<section class="features">
-  <div class="features-inner">
-    <h2>Fonctionnalités clés</h2>
-    <div class="feature-list">
-      <div class="feature mat-card-like" *ngFor="let f of features">
-        <div class="feature-icon"><span class="material-icons">school</span></div>
-        <div>
-          <div class="feature-title">{{ f.title }}</div>
-          <div class="feature-desc">{{ f.desc }}</div>
+  <div class="main-content">
+    <!-- 2️⃣ BOUTON ACCÈS RAPIDE FLOTTANT -->
+    <button class="quick-access-btn" (click)="getStarted()" title="Accès rapide au tableau de bord">
+      <span class="material-icons">dashboard</span>
+      <span class="quick-access-text">Accès rapide</span>
+    </button>
+
+    <section class="features" id="fonctionnalites">
+      <h2>Fonctionnalités clés</h2>
+      <div class="features-grid">
+        <!-- 3️⃣ CARTES INTERACTIVES AVEC HOVER -->
+        <div class="feature interactive-card" *ngFor="let f of features">
+          <div class="feature-icon"><span class="material-icons">school</span></div>
+          <div>
+            <div class="feature-title">{{ f.title }}</div>
+            <div class="feature-desc">{{ f.desc }}</div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <section class="stacked-section events-section" id="evenements">
+      <div class="card events-card">
+        <div class="events-header">
+          <h3>Événements à venir</h3>
+          <div class="events-actions">
+            <button class="btn btn-secondary" (click)="prevMonth()"><span class="material-icons">chevron_left</span></button>
+            <div class="month-label">{{ monthLabel }}</div>
+            <button class="btn btn-secondary" (click)="nextMonth()"><span class="material-icons">chevron_right</span></button>
+          </div>
+        </div>
+
+        <div class="events-body">
+          <!-- 4️⃣ CALENDRIER AMÉLIORÉ -->
+          <div class="mini-calendar">
+            <div class="weekdays"><div *ngFor="let d of weekdays">{{ d }}</div></div>
+            <div class="days-grid">
+              <div *ngFor="let d of calendarDays" 
+                   [class.other-month]="d.otherMonth" 
+                   [class.has-event]="d.events?.length"
+                   [class.today]="isToday(d.date)"
+                   (click)="openDay(d)">
+                <div class="day-num">{{ d.date.getDate() }}</div>
+                <div class="dot" *ngIf="d.events?.length"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="upcoming-list">
+            <div class="upcoming-title">Prochains événements</div>
+            <div *ngIf="(upcomingEvents?.length || 0) === 0" class="no-events">Aucun événement prévu.</div>
+            <!-- 4️⃣ ÉVÉNEMENTS AVEC BADGES ET CLIQUABLES -->
+            <div class="event-item clickable-event" 
+                 *ngFor="let ev of (upcomingEvents || []) | slice:0:6"
+                 (click)="openEventModal(ev)">
+              <div class="ev-date">{{ ev.date | date:'dd MMM yyyy' }}</div>
+              <div class="ev-info">
+                <div class="ev-title">
+                  {{ ev.title }}
+                  <span class="event-badge" [class]="getEventType(ev.title)">{{ getEventType(ev.title) }}</span>
+                </div>
+                <div class="ev-desc">{{ ev.location }}</div>
+              </div>
+              <div class="ev-actions">
+                <button type="button" class="btn btn-primary btn-sm btn-hover-effect" (click)="openEventModal(ev); $event.stopPropagation()">Voir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stacked-section news-section">
+      <div class="card news-card">
+        <h3>Nouveautés</h3>
+        <div class="news-list">
+          <!-- 5️⃣ NOUVEAUTÉS AVEC ICÔNES ET ALTERNANCE -->
+          <div class="news-item" *ngFor="let n of newsItems; let idx = index" [class.alternate]="idx % 2 === 1">
+            <div class="news-icon">
+              <span class="material-icons">{{ getNewsIcon(n.title) }}</span>
+            </div>
+            <div class="news-content">
+              <div class="news-meta">{{ n.date }}</div>
+              <div class="news-title">{{ n.title }}</div>
+              <div class="news-body">{{ n.body }}</div>
+              <div class="news-actions" *ngIf="isAdmin">
+                <button class="btn btn-secondary" (click)="startEdit(idx)">Modifier</button>
+                <button class="btn btn-secondary" (click)="removeNews(idx)">Supprimer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-panel" *ngIf="isAdmin">
+          <h4>Gérer les nouveautés</h4>
+          <div *ngIf="editingIndex === null">
+            <input [(ngModel)]="editTitle" placeholder="Titre" />
+            <textarea [(ngModel)]="editBody" placeholder="Contenu"></textarea>
+            <div class="admin-actions">
+              <button class="btn btn-primary" (click)="addNews()">Ajouter</button>
+              <button class="btn btn-secondary" (click)="clearEditor()">Effacer</button>
+            </div>
+          </div>
+          <div *ngIf="editingIndex !== null">
+            <input [(ngModel)]="editTitle" placeholder="Titre" />
+            <textarea [(ngModel)]="editBody" placeholder="Contenu"></textarea>
+            <div class="admin-actions">
+              <button class="btn btn-primary" (click)="saveEdit()">Enregistrer</button>
+              <button class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stacked-section contact-section" id="contact">
+      <div class="contact-wrapper">
+        <!-- 6️⃣ FORMULAIRE AMÉLIORÉ -->
+        <div class="contact-inner">
+          <div class="contact-info">
+            <h2 class="title">Contactez-nous</h2>
+            <p class="welcome-text">Nous sommes là pour vous aider ! N'hésitez pas à nous contacter.</p>
+            <p class="description">Laissez votre email et nous vous répondrons sous 24 heures.</p>
+            
+            <!-- 7️⃣ LIENS SOCIAUX AMÉLIORÉS -->
+            <div class="contact-icons">
+              <a class="social social-hover" href="#" target="_blank">
+                <span class="material-icons">public</span>
+                <span>Twitter</span>
+              </a>
+              <a class="social social-hover" href="#" target="_blank">
+                <span class="material-icons">play_circle</span>
+                <span>YouTube</span>
+              </a>
+              <a class="social social-hover" href="#" target="_blank">
+                <span class="material-icons">photo_camera</span>
+                <span>Instagram</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="form">
+            <label class="label">Email</label>
+            <input class="input" type="email" [(ngModel)]="contactEmail" placeholder="votre@email.com" />
+
+            <label class="label">Nom</label>
+            <input class="input" type="text" [(ngModel)]="contactName" placeholder="John Doe" />
+
+            <label class="label">Votre message</label>
+            <textarea class="input" rows="4" [(ngModel)]="contactMessage" placeholder="Votre message..."></textarea>
+
+            <div class="actions">
+              <button class="btn btn-primary btn-send" (click)="sendContact()">
+                <span class="material-icons">send</span>
+                Envoyer
+              </button>
+            </div>
+            <!-- 6️⃣ MESSAGE DE CONFIRMATION -->
+            <div *ngIf="contactSent" class="confirmation-message">
+              <span class="material-icons">check_circle</span>
+              <span>Message envoyé avec succès ! Nous vous répondrons bientôt.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <app-footer></app-footer>
+
+    <div class="event-modal-backdrop" *ngIf="showEventModal" (click)="closeEventModal()"></div>
+    <div class="event-modal" *ngIf="showEventModal">
+      <button class="modal-close" (click)="closeEventModal()"><span class="material-icons">close</span></button>
+      <h3>{{ selectedEvent?.title }}</h3>
+      <div class="ev-meta">{{ selectedEvent?.date | date:'fullDate' }} — {{ selectedEvent?.location }}</div>
+      <p class="ev-desc">{{ selectedEvent?.desc }}</p>
+      <div class="modal-actions"><button class="btn btn-primary" (click)="addToCalendar(selectedEvent)">Ajouter au calendrier</button><button class="btn btn-secondary" (click)="closeEventModal()">Fermer</button></div>
     </div>
   </div>
+
 </section>
+</div>
+<!-- End landing-container -->
