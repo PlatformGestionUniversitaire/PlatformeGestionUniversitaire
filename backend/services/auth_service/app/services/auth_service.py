@@ -84,8 +84,9 @@ class AuthService:
 
         # Log to console / application logger that the user has been created
         try:
+            # Include role and is_superuser in the format string to match provided args
             self.logger.info(
-                "Utilisateur créé: id=%s email=%s username=%s",
+                "Utilisateur créé: id=%s email=%s username=%s role=%s is_superuser=%s",
                 db_user.id,
                 db_user.email,
                 db_user.username,

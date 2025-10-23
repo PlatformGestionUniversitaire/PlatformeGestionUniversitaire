@@ -8,7 +8,8 @@ import { User, UserRole, LoginRequest, RegisterRequest, AuthResponse } from '../
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = '/api/auth'; // À adapter selon votre backend
+  // Point to the local auth service. If you run through the API gateway change to '/api/auth'
+  private readonly API_URL = 'http://localhost:8000/api/auth'; // Adjust if you run the gateway or a different port
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'current_user';
 
@@ -28,9 +29,19 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials)
       .pipe(
         tap(response => {
-          this.setSession(response);
-          this.currentUserSubject.next(response.user);
-          this.redirectByRole(response.user.role);
+          // Backend returns access_token and user
+          const token = (response as any).access_token || (response as any).token;
+          const user = (response as any).user;
+          console.debug('AuthService.login response', { token, user });
+          if (token && user) {
+            // Normalize role and store
+            const normalizedUser = { ...user, role: this.normalizeRole(user.role) } as any;
+            this.setSession({ access_token: token, user: normalizedUser } as any);
+            this.currentUserSubject.next(normalizedUser);
+            this.redirectByRole(normalizedUser.role);
+          }
+        }, err => {
+          console.error('AuthService.login error', err);
         })
       );
   }
@@ -39,17 +50,12 @@ export class AuthService {
    * Inscription (optionnelle - peut être désactivée)
    * Si activée, l'utilisateur sera automatiquement créé avec le rôle "student"
    */
-  register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/register`, {
+  register(data: RegisterRequest): Observable<any> {
+    // Backend register endpoint returns the created user (UserResponse)
+    return this.http.post<any>(`${this.API_URL}/register`, {
       ...data,
-      role: 'student' // Rôle par défaut pour l'auto-inscription
-    }).pipe(
-      tap(response => {
-        // On peut rediriger vers login ou connecter directement
-        // this.setSession(response);
-        // this.currentUserSubject.next(response.user);
-      })
-    );
+      // role: 'student' // backend may assign default role; uncomment if backend expects role
+    });
   }
 
   /**
@@ -103,9 +109,41 @@ export class AuthService {
   /**
    * Stocke la session de l'utilisateur
    */
-  private setSession(authResponse: AuthResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, authResponse.token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.user));
+  private setSession(authResponse: any): void {
+    const token = authResponse.access_token || authResponse.token;
+    const user = authResponse.user;
+    if (token) {
+      localStorage.setItem(this.TOKEN_KEY, token);
+    }
+    if (user) {
+      // Ensure stored user has a normalized role
+      const u = { ...user, role: this.normalizeRole(user.role) };
+      localStorage.setItem(this.USER_KEY, JSON.stringify(u));
+    }
+  }
+
+  /**
+   * Normalize backend role strings (French values) to frontend UserRole values
+   */
+  private normalizeRole(rawRole: string | undefined): any {
+    if (!rawRole) return 'student';
+    const r = String(rawRole).toLowerCase();
+    switch (r) {
+      case 'etudiant':
+      case 'student':
+        return 'student';
+      case 'enseignant':
+      case 'teacher':
+        return 'teacher';
+      case 'directeur':
+      case 'director':
+        return 'director';
+      case 'admin':
+      case 'administrator':
+        return 'admin';
+      default:
+        return 'student';
+    }
   }
 
   /**
@@ -139,6 +177,12 @@ export class AuthService {
       admin: '/admin/dashboard',
       director: '/director/dashboard'
     };
-    this.router.navigate([routes[role]]);
+    const target = routes[role as UserRole] || '/';
+    try {
+      this.router.navigate([target]);
+    } catch (err) {
+      console.error('redirectByRole failed', err, { role, target });
+      this.router.navigate(['/']);
+    }
   }
 }

@@ -28,8 +28,25 @@ async def register(
             detail="Un utilisateur avec cet email existe déjà"
         )
 
-    # Créer l'utilisateur
-    user = await auth_service.create_user(user_data)
+    # Vérifier si le username est déjà pris
+    existing_username = await auth_service.get_user_by_username(user_data.username)
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Un utilisateur avec ce nom d'utilisateur existe déjà"
+        )
+
+    # Créer l'utilisateur (avec gestion d'erreur pour obtenir un message de debug)
+    try:
+        user = await auth_service.create_user(user_data)
+    except Exception as exc:
+        # Log the full exception with traceback for debugging and return a sanitized error to the client
+        logger.exception("Erreur lors de la création d'un utilisateur: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur interne lors de la création de l'utilisateur"
+        )
+
     # Log confirmation
     try:
         logger.info("Nouvel utilisateur enregistré: id=%s email=%s username=%s", user.id, user.email, user.username)
