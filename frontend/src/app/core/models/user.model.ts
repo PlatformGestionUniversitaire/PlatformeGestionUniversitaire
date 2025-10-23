@@ -23,5 +23,7 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  // Backend returns access_token (JWT) and token_type
+  access_token: string;
+  token_type?: string;
 }
