@@ -43,6 +43,7 @@ export const routes: Routes = [
 			{ path: '', loadComponent: () => import('./features/director/pages/director-dashboard/director-dashboard.component').then(m => m.DirectorDashboardComponent) },
 			{ path: 'dashboard', loadComponent: () => import('./features/director/pages/director-dashboard/director-dashboard.component').then(m => m.DirectorDashboardComponent) },
 			{ path: 'timetable', loadComponent: () => import('./features/director/pages/timetable-page/timetable-page.component').then(m => m.TimetablePageComponent) },
+			{ path: 'timetable/create', loadComponent: () => import('./features/director/components/timetable-creator/timetable-creator.component').then(m => m.TimetableCreatorComponent) },
 			{ path: 'stats', loadComponent: () => import('./features/director/pages/stats-page/stats-page.component').then(m => m.StatsPageComponent) },
 			{ path: 'subjects', loadComponent: () => import('./features/director/pages/referentials-page/referentials-page.component').then(m => m.ReferentialsPageComponent) },
 			{ path: 'groups', loadComponent: () => import('./features/director/pages/referentials-page/referentials-page.component').then(m => m.ReferentialsPageComponent) },
@@ -62,7 +63,7 @@ export const routes: Routes = [
 			{ path: 'conflicts', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
 			{ path: 'settings', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) }
 		]
-	},
+  	},
 
 	{ path: '**', loadComponent: () => import('./components/not-found/not-found.component').then(m => m.NotFoundComponent) }
 ];

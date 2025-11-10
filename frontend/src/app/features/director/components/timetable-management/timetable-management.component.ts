@@ -11,6 +11,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { DirectorService } from '../../services/director.service';
+import { Router } from '@angular/router';
+import { TimetableCreatorService } from '../timetable-creator/timetable-creator.service';
 import { Timetable, TimetableConflict } from '../../models/director.models';
 
 @Component({
@@ -36,6 +38,7 @@ export class TimetableManagementComponent implements OnInit {
   timetables: Timetable[] = [];
   conflicts: TimetableConflict[] = [];
   loading = true;
+  creating = false;
   
   displayedColumns: string[] = ['subject', 'group', 'teacher', 'time', 'room', 'status', 'actions'];
   conflictColumns: string[] = ['type', 'description', 'severity', 'actions'];
@@ -51,7 +54,9 @@ export class TimetableManagementComponent implements OnInit {
   constructor(
     private directorService: DirectorService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private creatorService: TimetableCreatorService
   ) {}
 
   ngOnInit() {
@@ -160,8 +165,22 @@ export class TimetableManagementComponent implements OnInit {
   }
 
   createNewTimetable() {
-    // Ouvrir un dialogue pour créer un nouvel emploi du temps
-    this.showMessage('Fonctionnalité de création d\'emploi du temps à implémenter');
+    // Navigate immediately for snappier UX, then fetch groups in background.
+    // Provide an empty initial value so the creator page can render.
+    this.creatorService.setInitialGroups([]);
+    this.creating = true;
+    this.router.navigateByUrl('/director/timetable/create');
+
+    this.directorService.getGroups('dept-1').subscribe({
+      next: (groups) => {
+        this.creatorService.setInitialGroups(groups || []);
+        this.creating = false;
+      },
+      error: (err) => {
+        this.creating = false;
+        this.showMessage('Impossible de récupérer les groupes.');
+      }
+    });
   }
 
   exportTimetable() {

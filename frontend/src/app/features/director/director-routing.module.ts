@@ -5,6 +5,7 @@ import { StatsPageComponent } from './pages/stats-page/stats-page.component';
 import { ReferentialsPageComponent } from './pages/referentials-page/referentials-page.component';
 import { MakeupPageComponent } from './pages/makeup-page/makeup-page.component';
 import { ConflictsPageComponent } from './pages/conflicts-page/conflicts-page.component';
+import { TimetableCreatorComponent } from './components/timetable-creator/timetable-creator.component';
 
 export const directorRoutes: Routes = [
   {
@@ -18,6 +19,10 @@ export const directorRoutes: Routes = [
   {
     path: 'timetable',
     component: TimetablePageComponent
+  },
+  {
+    path: 'timetable/create',
+    component: TimetableCreatorComponent
   },
   {
     path: 'stats',
