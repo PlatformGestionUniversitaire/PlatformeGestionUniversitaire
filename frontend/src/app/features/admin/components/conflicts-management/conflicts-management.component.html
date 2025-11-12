@@ -19,7 +19,7 @@
           <ul style="list-style:none;padding:0">
             <li *ngFor="let c of conflicts" style="padding:8px 0;border-bottom:1px solid #eee;">
               [{{ c.severity }}] {{ c.description }} (timetable #{{ c.timetableId }})
-              <div style="float:right"><button (click)="resolve(c.id)">Résoudre</button></div>
+              <div style="float:right"><button class="btn primary" (click)="resolve(c.id)">Résoudre</button></div>
             </li>
           </ul>
         </div>

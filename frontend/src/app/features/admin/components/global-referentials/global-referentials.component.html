@@ -1,17 +1,32 @@
-<div class="admin-page">
-  <div class="admin-sidebar">
-    <ul>
-      <li *ngFor="let s of sections" (click)="setSection(s)" [class.active]="s===activeSection">{{s.title}}</li>
-    </ul>
+<div class="global-referentials">
+  <!-- Floating decorative shapes (background) -->
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
   </div>
 
-  <div class="admin-content">
+  <!-- Page header (styled like dashboard) -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Référentiels globaux</h1>
+      <p class="subtitle">Gérer et superviser les référentiels institutionnels</p>
+    </div>
+  </header>
+  <div class="dashboard-content">
+    <div class="admin-sidebar">
+      <ul>
+        <li *ngFor="let s of sections" (click)="setSection(s)" [class.active]="s===activeSection">{{s.title}}</li>
+      </ul>
+    </div>
+
+    <div class="admin-content">
     <div class="panel">
       <div class="panel-header">
         <h2>{{activeSection.title}}</h2>
         <div class="actions">
-          <button class="btn-primary" (click)="add()">Ajouter</button>
-          <button (click)="loadAll()">Rafraîchir</button>
+          <button class="btn primary" (click)="add()">Ajouter</button>
+          <button class="btn secondary" (click)="loadAll()">Rafraîchir</button>
         </div>
       </div>
 
@@ -25,15 +40,16 @@
               <td>{{i + 1}}</td>
               <td>{{item.name || item.title || item.email || item.label}}</td>
               <td>
-                <button class="btn-danger" (click)="remove(item)">Supprimer</button>
+                <button class="btn danger" (click)="remove(item)">Supprimer</button>
               </td>
             </tr>
-            <tr *ngIf="activeSection.items?.length === 0">
+            <tr *ngIf="activeSection.items.length === 0">
               <td colspan="3" class="empty">Aucun élément</td>
             </tr>
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   </div>
 </div>

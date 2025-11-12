@@ -159,6 +159,38 @@ export class TimetableManagementComponent implements OnInit {
     }
   }
 
+  editTimetable(timetable: Timetable) {
+    // Minimal edit: allow changing room and time for demo purposes
+    const newRoom = prompt('Nouvelle salle:', timetable.roomId) || timetable.roomId;
+    const newStart = prompt('Nouvelle heure de début (HH:mm):', timetable.startTime) || timetable.startTime;
+    const newEnd = prompt('Nouvelle heure de fin (HH:mm):', timetable.endTime) || timetable.endTime;
+
+    const payload: any = {
+      roomId: newRoom.trim(),
+      startTime: newStart.trim(),
+      endTime: newEnd.trim()
+    };
+
+    this.directorService.updateTimetable(timetable.id, payload).subscribe({
+      next: () => {
+        this.showMessage('Emploi du temps mis à jour');
+        this.loadTimetables();
+      },
+      error: () => this.showMessage('Erreur lors de la mise à jour')
+    });
+  }
+
+  deleteTimetable(timetable: Timetable) {
+    if (!confirm(`Supprimer l'emploi du temps pour ${timetable.subjectId} ?`)) return;
+    this.directorService.deleteTimetable(timetable.id).subscribe({
+      next: () => {
+        this.showMessage('Emploi du temps supprimé');
+        this.loadTimetables();
+      },
+      error: () => this.showMessage('Erreur lors de la suppression')
+    });
+  }
+
   resolveConflict(conflict: TimetableConflict) {
     // Ouvrir un dialogue pour résoudre le conflit
     this.showMessage('Fonctionnalité de résolution de conflit à implémenter');

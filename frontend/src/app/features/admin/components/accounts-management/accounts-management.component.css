@@ -15,9 +15,9 @@ th { background: #fafafa; color: #333; font-weight: 600; }
 .accounts-toolbar .right { display:flex; align-items:center; gap:0.5rem; }
 
 /* Buttons */
-.btn { padding:0.45rem 0.8rem; border-radius:8px; border: none; cursor:pointer; font-weight:600; }
+.btn { padding:0.45rem 0.8rem; border-radius:8px; border: none; cursor:pointer; font-weight:600; margin: 20px;}
 .btn.primary { background: linear-gradient(135deg, var(--brand-dark-blue), var(--brand-light-blue)); color:white; }
-.btn.danger { background:#ff6666; color:white; }
+.btn.danger { background:#ff6666; color:white; margin:10px; }
 .btn[disabled] { opacity:0.5; cursor:not-allowed; }
 
 /* Table visuals */

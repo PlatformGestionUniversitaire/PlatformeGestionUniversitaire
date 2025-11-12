@@ -33,6 +33,10 @@ export const directorRoutes: Routes = [
     component: ReferentialsPageComponent
   },
   {
+    path: 'groups/create',
+    component: ReferentialsPageComponent
+  },
+  {
     path: 'groups',
     component: ReferentialsPageComponent
   },

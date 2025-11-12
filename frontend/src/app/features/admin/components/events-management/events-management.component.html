@@ -1,18 +1,37 @@
-<div class="admin-page">
-  <div class="panel">
-    <div class="panel-header">
-      <h2>Événements institutionnels</h2>
-      <div class="actions"><button class="btn-primary" (click)="add()">Nouvel événement</button></div>
+<div class="events-management">
+  <!-- decorative shapes -->
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Événements institutionnels</h1>
+      <p class="subtitle">Superviser et gérer les événements institutionnels</p>
     </div>
-    <div class="panel-body">
-      <ul class="events-list">
-        <li *ngFor="let e of events">
-          <div class="title">{{e.title}}</div>
-          <div class="meta">{{e.date | date:'medium'}}</div>
-          <div class="actions"><button class="btn-danger" (click)="remove(e)">Supprimer</button></div>
-        </li>
-        <li *ngIf="events?.length === 0" class="empty">Aucun événement</li>
-      </ul>
+  </header>
+
+  <div class="dashboard-content">
+    <div class="admin-content">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Événements institutionnels</h2>
+          <div class="actions"><button class="btn primary" (click)="add()">Nouvel événement</button></div>
+        </div>
+        <div class="panel-body">
+          <ul class="events-list">
+            <li *ngFor="let e of events">
+              <div class="title">{{e.title}}</div>
+              <div class="meta">{{e.date | date:'medium'}}</div>
+              <div class="actions"><button class="btn danger" (click)="remove(e)">Supprimer</button></div>
+            </li>
+            <li *ngIf="events.length === 0" class="empty">Aucun événement</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </div>

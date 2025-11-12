@@ -69,7 +69,7 @@ import { DirectorService } from './services/director.service';
   // All components are standalone, so we import them here
     DirectorDashboardComponent,
     TimetableManagementComponent,
-  TimetableCreatorComponent,
+    TimetableCreatorComponent,
     DepartmentStatsComponent,
     ReferentialsComponent,
     TimetablePageComponent,

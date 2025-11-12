@@ -59,9 +59,10 @@ export const routes: Routes = [
 			{ path: 'referentials', loadComponent: () => import('./features/admin/components/global-referentials/global-referentials.component').then(m => m.GlobalReferentialsComponent) },
 			{ path: 'events', loadComponent: () => import('./features/admin/components/events-management/events-management.component').then(m => m.EventsManagementComponent) },
 			{ path: 'reports', loadComponent: () => import('./features/admin/components/reports/reports.component').then(m => m.ReportsComponent) },
-			{ path: 'timetables', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
-			{ path: 'conflicts', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
-			{ path: 'settings', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) }
+			{ path: 'timetables', loadComponent: () => import('./features/admin/components/timetables-management/timetables-management.component').then(m => m.TimetablesManagementComponent) },
+			{ path: 'conflicts', loadComponent: () => import('./features/admin/components/conflicts-management/conflicts-management.component').then(m => m.ConflictsManagementComponent) },
+			{ path: 'settings', loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+			{path: 'accounts', loadComponent: () => import('./features/admin/components/accounts-management/accounts-management.component').then(m => m.AccountsManagementComponent) }
 		]
   	},
 

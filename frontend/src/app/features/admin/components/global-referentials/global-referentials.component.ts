@@ -21,8 +21,8 @@ interface Section {
 	selector: 'admin-global-referentials',
 	standalone: true,
 	imports: [CommonModule],
-	templateUrl: './global-referentials.component.html',
-	styleUrls: ['./global-referentials.component.css']
+		templateUrl: './global-referentials.component.html',
+		styleUrls: ['../../admin.styles.css', './global-referentials.component.css']
 })
 export class GlobalReferentialsComponent implements OnInit {
 	sections: Section[] = [
