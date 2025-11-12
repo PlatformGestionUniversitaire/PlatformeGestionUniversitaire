@@ -111,7 +111,7 @@
 
           <div class="upcoming-list">
             <div class="upcoming-title">Prochains événements</div>
-            <div *ngIf="(upcomingEvents?.length || 0) === 0" class="no-events">Aucun événement prévu.</div>
+            <div *ngIf="(upcomingEvents.length || 0) === 0" class="no-events">Aucun événement prévu.</div>
             <!-- 4️⃣ ÉVÉNEMENTS AVEC BADGES ET CLIQUABLES -->
             <div class="event-item clickable-event" 
                  *ngFor="let ev of (upcomingEvents || []) | slice:0:6"
